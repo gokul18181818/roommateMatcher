@@ -168,7 +168,12 @@ export default function EditProfilePage() {
 
     updateProfile.mutate(submitData, {
       onSuccess: () => {
-        navigate('/my-profile')
+        // Navigate back to profile page after successful save
+        navigate('/my-profile', { replace: true })
+      },
+      onError: (error) => {
+        console.error('Failed to update profile:', error)
+        // You could add a toast notification here if needed
       },
     })
   }
