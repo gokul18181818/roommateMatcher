@@ -89,15 +89,15 @@ export default function ProfileDetailPage() {
                     <span className="text-sm">View LinkedIn Profile</span>
                   </a>
                 )}
-                {profile.instagram_handle && (
+                {profile.instagram_handle && profile.instagram_handle.trim() && (
                   <a
-                    href={`https://www.instagram.com/${profile.instagram_handle.replace('@', '')}`}
+                    href={`https://www.instagram.com/${profile.instagram_handle.replace(/^@+/, '')}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors font-medium"
                   >
-                    <InstagramIcon className="h-5 w-5" />
-                    <span className="text-sm">@{profile.instagram_handle.replace('@', '')}</span>
+                    <InstagramIcon className="h-5 w-5 text-primary" />
+                    <span className="text-sm">@{profile.instagram_handle.replace(/^@+/, '')}</span>
                   </a>
                 )}
               </div>

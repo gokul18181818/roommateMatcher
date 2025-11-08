@@ -20,6 +20,7 @@ export function useProfile(userId?: string) {
       return data as Profile
     },
     enabled: !!userId || !!useAuthStore.getState().user,
+    refetchOnMount: true,
   })
 }
 
