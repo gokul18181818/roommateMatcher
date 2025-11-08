@@ -1,0 +1,22 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle for better visibility -->
+  <circle cx="64" cy="64" r="60" fill="#42B8B8" opacity="0.1"/>
+  
+  <!-- House outline in medium teal - thicker strokes -->
+  <path d="M 64 20 L 96 40 L 96 80 L 32 80 L 32 40 Z" fill="none" stroke="#42B8B8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Ladder inside house - deep blue - thicker strokes -->
+  <g stroke="#2A5C8D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Left rail -->
+    <line x1="52" y1="76" x2="52" y2="44"/>
+    <!-- Right rail -->
+    <line x1="76" y1="76" x2="76" y2="44"/>
+    <!-- Rungs (5 rungs, evenly spaced) -->
+    <line x1="52" y1="70" x2="76" y2="70"/>
+    <line x1="53" y1="62" x2="75" y2="62"/>
+    <line x1="54" y1="54" x2="74" y2="54"/>
+    <line x1="55" y1="46" x2="73" y2="46"/>
+    <line x1="56" y1="38" x2="72" y2="38"/>
+  </g>
+</svg>
+
