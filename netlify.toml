@@ -2,6 +2,12 @@
   command = "npm run build"
   publish = "dist"
 
+# SPA redirect rule - all routes go to index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
 # IMPORTANT: To fix secrets scanning errors, add these environment variables in Netlify UI:
 # Go to: Site Settings → Environment Variables → Add variable
 #
