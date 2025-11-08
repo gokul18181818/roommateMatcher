@@ -14,7 +14,7 @@ export default function ChatPage() {
   const { user } = useAuthStore()
   const [message, setMessage] = useState('')
   const [isTyping, setIsTyping] = useState(false)
-  const [otherUserTyping, setOtherUserTyping] = useState(false)
+  const [otherUserTyping] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const queryClient = useQueryClient()
@@ -197,18 +197,6 @@ export default function ChatPage() {
     return 'delivered'
   }
 
-  const formatMessageTime = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
-    const diffMins = Math.floor(diffMs / 60000)
-    
-    if (diffMins < 1) return 'Just now'
-    if (diffMins < 60) return `${diffMins}m`
-    if (diffMins < 1440) return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
-  }
-
   const formatFullTime = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
@@ -263,7 +251,6 @@ export default function ChatPage() {
             messages.map((msg, index) => {
               const isOwn = msg.sender_id === user?.id
               const prevMessage = index > 0 ? messages[index - 1] : null
-              const nextMessage = index < messages.length - 1 ? messages[index + 1] : null
               const showTime = !prevMessage || 
                 new Date(msg.created_at).getTime() - new Date(prevMessage.created_at).getTime() > 300000 // 5 minutes
               const isConsecutive = prevMessage && prevMessage.sender_id === msg.sender_id && 
