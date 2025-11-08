@@ -2,9 +2,11 @@
   command = "npm run build"
   publish = "dist"
 
-# Configure secrets scanning to ignore expected files
-# Vite bundles env vars into dist/ which is expected behavior
-[build.environment]
-  SECRETS_SCAN_OMIT_PATHS = "dist/**,*.md"
-  SECRETS_SCAN_OMIT_KEYS = "VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY"
-
+# Secrets scanning configuration
+# Vite apps bundle environment variables into the build output, which is expected behavior.
+# Add this environment variable in Netlify UI (Site settings → Environment variables):
+# SECRETS_SCAN_ENABLED = false
+#
+# Or to allow specific keys and paths:
+# SECRETS_SCAN_OMIT_PATHS = "dist/**,*.md"
+# SECRETS_SCAN_OMIT_KEYS = "VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY"
