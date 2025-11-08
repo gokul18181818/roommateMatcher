@@ -5,7 +5,6 @@ import { useAuthStore } from '@/stores/authStore'
 import { supabase } from '@/lib/supabase'
 import { Message, Conversation, Profile } from '@/types'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Avatar } from '@/components/ui/avatar'
 import { ArrowLeft, Send } from 'lucide-react'
 import { formatRelativeTime } from '@/lib/utils'
@@ -64,12 +63,11 @@ export default function ChatPage() {
       return data as Message[]
     },
     enabled: !!conversationId,
-    refetchInterval: 2000, // Poll every 2 seconds for new messages
+    refetchInterval: 2000,
   })
 
   useEffect(() => {
     if (conversationId && user) {
-      // Subscribe to real-time messages
       const channel = supabase
         .channel(`messages:${conversationId}`)
         .on(
@@ -96,7 +94,6 @@ export default function ChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  // Mark messages as read
   useEffect(() => {
     if (messages && user) {
       const unreadMessages = messages.filter(
@@ -133,7 +130,6 @@ export default function ChatPage() {
 
       if (error) throw error
 
-      // Update conversation
       await supabase
         .from('conversations')
         .update({
@@ -160,73 +156,133 @@ export default function ChatPage() {
   }
 
   if (!conversation || !otherUser) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>
+    return (
+      <div className="h-screen bg-background flex items-center justify-center">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    )
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)] max-w-4xl mx-auto">
-      <div className="flex items-center gap-4 p-4 border-b bg-white rounded-t-lg">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/messages')}>
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <Link to={`/profile/${otherUser.id}`} className="flex items-center gap-3 flex-1">
-          <Avatar
-            src={otherUser.profile_photo_url || null}
-            fallback={otherUser.full_name}
-            className="h-10 w-10"
-          />
-          <div>
-            <h2 className="font-semibold">{otherUser.full_name}</h2>
-            <p className="text-sm text-muted-foreground">{otherUser.job_title} at {otherUser.company}</p>
-          </div>
-        </Link>
-      </div>
-
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-        {messages && messages.length > 0 ? (
-          messages.map((msg) => {
-            const isOwn = msg.sender_id === user?.id
-            return (
-              <div
-                key={msg.id}
-                className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
-              >
-                <div
-                  className={`max-w-[70%] rounded-2xl px-4 py-2 ${
-                    isOwn
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-white text-gray-900'
-                  }`}
-                >
-                  <p className="text-sm">{msg.content}</p>
-                  <p className={`text-xs mt-1 ${isOwn ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
-                    {formatRelativeTime(msg.created_at)}
-                  </p>
-                </div>
-              </div>
-            )
-          })
-        ) : (
-          <div className="text-center text-muted-foreground py-8">
-            No messages yet. Start the conversation!
-          </div>
-        )}
-        <div ref={messagesEndRef} />
-      </div>
-
-      <form onSubmit={handleSubmit} className="p-4 border-t bg-white rounded-b-lg">
-        <div className="flex gap-2">
-          <Input
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="Type a message..."
-            className="flex-1"
-          />
-          <Button type="submit" disabled={!message.trim() || sendMessage.isPending}>
-            <Send className="h-4 w-4" />
+    <div className="h-screen bg-background flex flex-col">
+      {/* iOS-style Header */}
+      <div className="bg-background border-b border-border/40 sticky top-0 z-10">
+        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/messages')}
+            className="h-8 w-8 -ml-2"
+          >
+            <ArrowLeft className="h-5 w-5" />
           </Button>
+          <Link
+            to={`/profile/${otherUser.id}`}
+            className="flex items-center gap-3 flex-1 min-w-0"
+          >
+            <Avatar
+              src={otherUser.profile_photo_url || null}
+              fallback={otherUser.full_name}
+              className="h-10 w-10 flex-shrink-0"
+            />
+            <div className="min-w-0 flex-1">
+              <h2 className="font-semibold text-foreground text-base truncate">
+                {otherUser.full_name}
+              </h2>
+            </div>
+          </Link>
         </div>
-      </form>
+      </div>
+
+      {/* Messages Area */}
+      <div className="flex-1 overflow-y-auto bg-muted/30">
+        <div className="max-w-2xl mx-auto px-4 py-6 space-y-2">
+          {messages && messages.length > 0 ? (
+            messages.map((msg, index) => {
+              const isOwn = msg.sender_id === user?.id
+              const prevMessage = index > 0 ? messages[index - 1] : null
+              const showTime = !prevMessage || 
+                new Date(msg.created_at).getTime() - new Date(prevMessage.created_at).getTime() > 300000 // 5 minutes
+              
+              return (
+                <div key={msg.id}>
+                  {showTime && (
+                    <div className="flex justify-center my-4">
+                      <span className="text-xs text-muted-foreground bg-background px-2 py-1 rounded-full">
+                        {new Date(msg.created_at).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: 'numeric',
+                          minute: '2-digit',
+                        })}
+                      </span>
+                    </div>
+                  )}
+                  <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'} mb-1`}>
+                    <div
+                      className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
+                        isOwn
+                          ? 'bg-primary text-primary-foreground rounded-br-sm'
+                          : 'bg-background text-foreground rounded-bl-sm shadow-sm'
+                      }`}
+                    >
+                      <p className="text-[15px] leading-relaxed whitespace-pre-wrap break-words">
+                        {msg.content}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )
+            })
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full py-20">
+              <p className="text-muted-foreground text-sm">No messages yet</p>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+      </div>
+
+      {/* iOS-style Input Area */}
+      <div className="bg-background border-t border-border/40 pb-safe">
+        <form onSubmit={handleSubmit} className="max-w-2xl mx-auto px-4 py-3">
+          <div className="flex items-end gap-2">
+            <div className="flex-1 min-h-[36px] max-h-32 bg-muted/50 rounded-3xl px-4 py-2 flex items-end overflow-y-auto">
+              <textarea
+                value={message}
+                onChange={(e) => {
+                  setMessage(e.target.value)
+                  e.target.style.height = 'auto'
+                  e.target.style.height = `${Math.min(e.target.scrollHeight, 128)}px`
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault()
+                    if (message.trim()) {
+                      handleSubmit(e)
+                    }
+                  }
+                }}
+                placeholder="Message"
+                rows={1}
+                className="flex-1 bg-transparent border-0 resize-none focus:outline-none text-[15px] text-foreground placeholder:text-muted-foreground leading-relaxed"
+                style={{ maxHeight: '128px' }}
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={!message.trim() || sendMessage.isPending}
+              className={`h-9 w-9 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
+                message.trim()
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                  : 'bg-muted text-muted-foreground cursor-not-allowed'
+              }`}
+            >
+              <Send className="h-4 w-4" />
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   )
 }

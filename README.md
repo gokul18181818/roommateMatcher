@@ -1,6 +1,6 @@
-# InternMatcher
+# CareerCrib
 
-A modern roommate matching platform for interns and new grads to find like-minded roommates based on career fields, companies, and professional interests.
+A modern roommate matching platform for professionals to find like-minded roommates based on career fields, companies, and professional interests.
 
 ## 🚀 Features
 

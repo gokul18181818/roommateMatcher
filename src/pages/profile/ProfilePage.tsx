@@ -3,19 +3,23 @@ import { useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useAuthStore } from '@/stores/authStore'
 import { useProfile } from '@/hooks/useProfile'
+import { useProfilePhoto } from '@/hooks/useProfilePhoto'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Edit, MapPin, Briefcase, Building2, Calendar, DollarSign, Trash2, Linkedin } from 'lucide-react'
+import { Edit, MapPin, Calendar, DollarSign, Trash2 } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
+import CompanyLogo from '@/components/ui/CompanyLogo'
+import JobTitleIcon from '@/components/ui/JobTitleIcon'
+import ProfilePhotoUpload from '@/components/profile/ProfilePhotoUpload'
 
 export default function ProfilePage() {
   const navigate = useNavigate()
   const { user, signOut } = useAuthStore()
   const { data: profile, isLoading } = useProfile()
+  const { uploadPhoto } = useProfilePhoto()
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
   const deleteAccount = useMutation({
@@ -71,7 +75,7 @@ export default function ProfilePage() {
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">My Profile</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-2">My Profile</h1>
           <p className="text-muted-foreground">
             Profile {completionPercentage}% complete
           </p>
@@ -86,22 +90,25 @@ export default function ProfilePage() {
 
       <Card className="border-0 shadow-lg overflow-hidden">
         <CardContent className="p-6">
-          {/* Profile Header with Circular Avatar */}
+          {/* Profile Header with Photo Upload */}
           <div className="flex flex-col items-center mb-6">
             <div className="relative mb-4">
-              <Avatar
-                src={profile.profile_photo_url || null}
-                fallback={profile.full_name}
-                className="h-32 w-32 border-4 border-white shadow-lg"
+              <ProfilePhotoUpload
+                currentPhotoUrl={profile.profile_photo_url}
+                onUpload={async (file) => {
+                  await uploadPhoto.mutateAsync(file)
+                }}
+                disabled={uploadPhoto.isPending}
+                fallbackName={profile.full_name}
               />
               {profile.is_verified && (
-                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
+                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 z-10">
                   <Badge variant="default" className="bg-blue-600">Verified</Badge>
                 </div>
               )}
             </div>
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-1">{profile.full_name}</h2>
+              <h2 className="text-2xl font-bold text-card-foreground mb-1">{profile.full_name}</h2>
               <p className="text-lg text-muted-foreground mb-3">{profile.age} years old</p>
               {profile.linkedin_profile_url && (
                 <a
@@ -110,7 +117,7 @@ export default function ProfilePage() {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
                 >
-                  <Linkedin className="h-5 w-5" />
+                  <img src="/linkedin-logo.svg" alt="LinkedIn" className="h-5 w-5" />
                   <span className="text-sm font-medium">View LinkedIn Profile</span>
                 </a>
               )}
@@ -119,14 +126,14 @@ export default function ProfilePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div className="flex items-center gap-3">
-              <Briefcase className="h-5 w-5 text-muted-foreground" />
+              <JobTitleIcon jobTitle={profile.job_title} className="text-muted-foreground" size={20} />
               <div>
                 <p className="text-sm text-muted-foreground">Job Title</p>
                 <p className="font-medium">{profile.job_title}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Building2 className="h-5 w-5 text-muted-foreground" />
+              <CompanyLogo companyName={profile.company} size={24} />
               <div>
                 <p className="text-sm text-muted-foreground">Company</p>
                 <p className="font-medium">{profile.company}</p>
@@ -148,18 +155,18 @@ export default function ProfilePage() {
 
           {profile.bio && (
             <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3">About</h3>
-              <p className="text-gray-700 leading-relaxed">{profile.bio}</p>
+              <h3 className="text-xl font-semibold mb-3 text-card-foreground">About</h3>
+              <p className="text-card-foreground/90 leading-relaxed">{profile.bio}</p>
             </div>
           )}
 
           {(profile.budget_min || profile.budget_max) && (
             <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
+              <h3 className="text-xl font-semibold mb-3 flex items-center gap-2 text-card-foreground">
                 <DollarSign className="h-5 w-5" />
                 Budget
               </h3>
-              <p className="text-gray-700">
+              <p className="text-card-foreground/90">
                 ${profile.budget_min || 'Any'} - ${profile.budget_max || 'Any'} / month
               </p>
             </div>
@@ -167,11 +174,11 @@ export default function ProfilePage() {
 
           {profile.move_in_date && (
             <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
+              <h3 className="text-xl font-semibold mb-3 flex items-center gap-2 text-card-foreground">
                 <Calendar className="h-5 w-5" />
                 Move-in Date
               </h3>
-              <p className="text-gray-700">
+              <p className="text-card-foreground/90">
                 {formatDate(profile.move_in_date)}
                 {profile.move_in_flexible && ' (Flexible)'}
               </p>

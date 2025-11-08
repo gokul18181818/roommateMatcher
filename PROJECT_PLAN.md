@@ -1,8 +1,8 @@
-# InternMatcher - Project Plan & Architecture
+# CareerCrib - Project Plan & Architecture
 
 ## 🎯 Project Overview
 
-**InternMatcher** is a roommate matching platform for interns and new grads to find like-minded roommates based on career fields, companies, and professional interests.
+**CareerCrib** is a roommate matching platform for professionals to find like-minded roommates based on career fields, companies, and professional interests.
 
 ### Core Value Proposition
 - LinkedIn-based authentication for verified professionals

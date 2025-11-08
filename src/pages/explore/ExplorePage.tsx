@@ -61,23 +61,23 @@ export default function ExplorePage() {
           <h1 className="text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent tracking-tight">
             Explore
           </h1>
-          <p className="text-gray-600 text-xl font-medium">Find your perfect roommate match</p>
+          <p className="text-muted-foreground text-xl font-medium">Find your perfect roommate match</p>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
-            <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 h-5 w-5 text-indigo-400" />
+            <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 h-5 w-5 text-indigo-400 dark:text-indigo-500" />
             <Input
               placeholder="Search by name, company, or job title..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-14 h-14 text-base border-0 bg-white shadow-lg focus:shadow-xl focus:ring-2 focus:ring-indigo-500/20 rounded-2xl"
+              className="pl-14 h-14 text-base border-0 bg-card shadow-lg focus:shadow-xl focus:ring-2 focus:ring-indigo-500/20 rounded-2xl"
             />
           </div>
           <Button
             variant="outline"
             onClick={() => setShowFilters(!showFilters)}
-            className="sm:w-auto h-14 px-6 border-0 bg-white shadow-lg hover:shadow-xl hover:bg-indigo-50 rounded-2xl font-semibold text-gray-700"
+            className="sm:w-auto h-14 px-6 border-0 bg-card shadow-lg hover:shadow-xl hover:bg-muted rounded-2xl font-semibold"
           >
             <Filter className="h-5 w-5 mr-2" />
             Filters
@@ -90,7 +90,7 @@ export default function ExplorePage() {
               className={`h-14 w-14 rounded-2xl border-0 shadow-lg hover:shadow-xl transition-all ${
                 viewMode === 'grid' 
                   ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white' 
-                  : 'bg-white text-gray-600 hover:bg-indigo-50'
+                  : 'bg-card text-muted-foreground hover:bg-muted'
               }`}
             >
               <Grid className="h-5 w-5" />
@@ -102,7 +102,7 @@ export default function ExplorePage() {
               className={`h-14 w-14 rounded-2xl border-0 shadow-lg hover:shadow-xl transition-all ${
                 viewMode === 'list' 
                   ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white' 
-                  : 'bg-white text-gray-600 hover:bg-indigo-50'
+                  : 'bg-card text-muted-foreground hover:bg-muted'
               }`}
             >
               <List className="h-5 w-5" />
@@ -111,40 +111,40 @@ export default function ExplorePage() {
         </div>
 
         {showFilters && (
-          <div className="p-8 bg-white rounded-2xl border-0 shadow-xl space-y-6">
+          <div className="p-8 bg-card rounded-2xl border shadow-xl space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-3">
-                <label className="text-sm font-bold text-gray-800 uppercase tracking-wide">City</label>
+                <label className="text-sm font-bold text-card-foreground uppercase tracking-wide">City</label>
                 <Input
                   placeholder="San Francisco"
                   value={filters.city}
                   onChange={(e) => setFilters({ ...filters, city: e.target.value })}
-                  className="border-0 bg-gray-50 rounded-xl h-12 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 shadow-sm"
+                  className="border-0 bg-muted rounded-xl h-12 focus:bg-card focus:ring-2 focus:ring-indigo-500/20 shadow-sm"
                 />
               </div>
               <div className="space-y-3">
-                <label className="text-sm font-bold text-gray-800 uppercase tracking-wide">Industry</label>
+                <label className="text-sm font-bold text-card-foreground uppercase tracking-wide">Industry</label>
                 <Input
                   placeholder="Technology"
                   value={filters.industry}
                   onChange={(e) => setFilters({ ...filters, industry: e.target.value })}
-                  className="border-0 bg-gray-50 rounded-xl h-12 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 shadow-sm"
+                  className="border-0 bg-muted rounded-xl h-12 focus:bg-card focus:ring-2 focus:ring-indigo-500/20 shadow-sm"
                 />
               </div>
               <div className="space-y-3">
-                <label className="text-sm font-bold text-gray-800 uppercase tracking-wide">Company</label>
+                <label className="text-sm font-bold text-card-foreground uppercase tracking-wide">Company</label>
                 <Input
                   placeholder="Google"
                   value={filters.company}
                   onChange={(e) => setFilters({ ...filters, company: e.target.value })}
-                  className="border-0 bg-gray-50 rounded-xl h-12 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 shadow-sm"
+                  className="border-0 bg-muted rounded-xl h-12 focus:bg-card focus:ring-2 focus:ring-indigo-500/20 shadow-sm"
                 />
               </div>
             </div>
             <Button
               variant="outline"
               onClick={() => setFilters({ city: '', industry: '', company: '' })}
-              className="text-gray-600 border-0 bg-gray-100 hover:bg-gray-200 rounded-xl font-semibold px-6"
+              className="border-0 bg-muted hover:bg-muted/80 rounded-xl font-semibold px-6"
             >
               Clear Filters
             </Button>
@@ -156,7 +156,7 @@ export default function ExplorePage() {
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="h-[500px] bg-gradient-to-br from-white to-indigo-50/50 animate-pulse rounded-2xl shadow-lg" />
+              <div key={i} className="h-[500px] bg-gradient-to-br from-card to-muted animate-pulse rounded-2xl shadow-lg" />
             ))}
           </div>
         ) : filteredProfiles && filteredProfiles.length > 0 ? (
@@ -172,13 +172,13 @@ export default function ExplorePage() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-20 px-4 bg-white rounded-2xl shadow-xl">
+          <div className="text-center py-20 px-4 bg-card rounded-2xl shadow-xl">
             <div className="max-w-md mx-auto space-y-4">
-              <div className="w-20 h-20 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full mx-auto flex items-center justify-center">
-                <Search className="h-10 w-10 text-indigo-400" />
+              <div className="w-20 h-20 bg-gradient-to-br from-indigo-100 dark:from-indigo-900/30 to-purple-100 dark:to-purple-900/30 rounded-full mx-auto flex items-center justify-center">
+                <Search className="h-10 w-10 text-indigo-400 dark:text-indigo-500" />
               </div>
-              <p className="text-gray-700 text-xl font-bold">No profiles found</p>
-              <p className="text-gray-500 text-base">Try adjusting your search or filters to find more matches.</p>
+              <p className="text-card-foreground text-xl font-bold">No profiles found</p>
+              <p className="text-muted-foreground text-base">Try adjusting your search or filters to find more matches.</p>
             </div>
           </div>
         )}

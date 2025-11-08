@@ -7,8 +7,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, MapPin, Briefcase, Building2, Calendar, DollarSign, MessageSquare, Bookmark, Linkedin } from 'lucide-react'
+import { ArrowLeft, MapPin, Calendar, DollarSign, MessageSquare, Bookmark } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
+import CompanyLogo from '@/components/ui/CompanyLogo'
+import JobTitleIcon from '@/components/ui/JobTitleIcon'
 
 export default function ProfileDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -63,13 +65,13 @@ export default function ProfileDetailPage() {
       <Button 
         variant="ghost" 
         onClick={() => navigate('/explore')} 
-        className="mb-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg"
+        className="mb-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg"
       >
         <ArrowLeft className="h-4 w-4 mr-2" />
         Back to Explore
       </Button>
 
-      <Card className="border border-gray-200 shadow-lg overflow-hidden bg-white">
+      <Card className="border shadow-lg overflow-hidden bg-card">
         <CardContent className="p-8">
           {/* Profile Header with Circular Avatar */}
           <div className="flex flex-col items-center mb-8">
@@ -88,16 +90,16 @@ export default function ProfileDetailPage() {
               )}
             </div>
             <div className="text-center space-y-2">
-              <h1 className="text-4xl font-bold text-gray-900 tracking-tight">{profile.full_name}</h1>
-              <p className="text-xl text-gray-500">{profile.age} years old</p>
+              <h1 className="text-4xl font-bold text-card-foreground tracking-tight">{profile.full_name}</h1>
+              <p className="text-xl text-muted-foreground">{profile.age} years old</p>
               {profile.linkedin_profile_url && (
                 <a
                   href={profile.linkedin_profile_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors mt-2 font-medium"
+                  className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors mt-2 font-medium"
                 >
-                  <Linkedin className="h-5 w-5" />
+                  <img src="/linkedin-logo.svg" alt="LinkedIn" className="h-5 w-5" />
                   <span className="text-sm">View LinkedIn Profile</span>
                 </a>
               )}
@@ -108,13 +110,13 @@ export default function ProfileDetailPage() {
             <Button
               onClick={() => bookmarkMutation.mutate()}
               variant="outline"
-              className="px-6 py-2.5 border-gray-200 hover:bg-gray-50 rounded-lg font-medium"
+              className="px-6 py-2.5 rounded-lg font-medium"
             >
               <Bookmark className="h-4 w-4 mr-2" />
               Bookmark
             </Button>
             <Link to={`/messages?user=${profile.id}`}>
-              <Button className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-sm hover:shadow-md transition-all">
+              <Button className="px-6 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium shadow-sm hover:shadow-md transition-all">
                 <MessageSquare className="h-4 w-4 mr-2" />
                 Message
               </Button>
@@ -122,37 +124,37 @@ export default function ProfileDetailPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
-              <div className="p-2 bg-white rounded-lg shadow-sm">
-                <Briefcase className="h-5 w-5 text-gray-600" />
+            <div className="flex items-start gap-4 p-4 bg-muted rounded-xl">
+              <div className="p-2 bg-card rounded-lg shadow-sm">
+                <JobTitleIcon jobTitle={profile.job_title} className="text-muted-foreground" size={20} />
               </div>
               <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Job Title</p>
-                <p className="text-base font-semibold text-gray-900">{profile.job_title}</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Job Title</p>
+                <p className="text-base font-semibold text-card-foreground">{profile.job_title}</p>
               </div>
             </div>
-            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
-              <div className="p-2 bg-white rounded-lg shadow-sm">
-                <Building2 className="h-5 w-5 text-gray-600" />
+            <div className="flex items-start gap-4 p-4 bg-muted rounded-xl">
+              <div className="p-2 bg-card rounded-lg shadow-sm flex items-center justify-center">
+                <CompanyLogo companyName={profile.company} size={24} />
               </div>
               <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Company</p>
-                <p className="text-base font-semibold text-gray-900">{profile.company}</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Company</p>
+                <p className="text-base font-semibold text-card-foreground">{profile.company}</p>
               </div>
             </div>
-            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
-              <div className="p-2 bg-white rounded-lg shadow-sm">
-                <MapPin className="h-5 w-5 text-gray-600" />
+            <div className="flex items-start gap-4 p-4 bg-muted rounded-xl">
+              <div className="p-2 bg-card rounded-lg shadow-sm">
+                <MapPin className="h-5 w-5 text-muted-foreground" />
               </div>
               <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Location</p>
-                <p className="text-base font-semibold text-gray-900">{profile.city}, {profile.state}</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Location</p>
+                <p className="text-base font-semibold text-card-foreground">{profile.city}, {profile.state}</p>
               </div>
             </div>
             {profile.industry && (
-              <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
-                <div className="p-2 bg-white rounded-lg shadow-sm">
-                  <Badge variant="outline" className="border-gray-300 text-gray-700 font-medium">{profile.industry}</Badge>
+              <div className="flex items-start gap-4 p-4 bg-muted rounded-xl">
+                <div className="p-2 bg-card rounded-lg shadow-sm">
+                  <Badge variant="outline" className="font-medium">{profile.industry}</Badge>
                 </div>
               </div>
             )}
@@ -160,31 +162,31 @@ export default function ProfileDetailPage() {
 
           {profile.bio && (
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">About</h2>
-              <p className="text-gray-700 leading-relaxed text-base">{profile.bio}</p>
+              <h2 className="text-2xl font-bold text-card-foreground mb-4">About</h2>
+              <p className="text-card-foreground/90 leading-relaxed text-base">{profile.bio}</p>
             </div>
           )}
 
           <div className="space-y-6">
             {(profile.budget_min || profile.budget_max) && (
-              <div className="p-5 bg-blue-50 rounded-xl border border-blue-100">
-                <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                  <DollarSign className="h-5 w-5 text-blue-600" />
+              <div className="p-5 bg-blue-50 dark:bg-blue-950/20 rounded-xl border border-blue-100 dark:border-blue-900/30">
+                <h2 className="text-lg font-semibold text-card-foreground mb-2 flex items-center gap-2">
+                  <DollarSign className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   Budget
                 </h2>
-                <p className="text-gray-700 text-base">
+                <p className="text-card-foreground/90 text-base">
                   ${profile.budget_min || 'Any'} - ${profile.budget_max || 'Any'} / month
                 </p>
               </div>
             )}
 
             {profile.move_in_date && (
-              <div className="p-5 bg-green-50 rounded-xl border border-green-100">
-                <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-green-600" />
+              <div className="p-5 bg-green-50 dark:bg-green-950/20 rounded-xl border border-green-100 dark:border-green-900/30">
+                <h2 className="text-lg font-semibold text-card-foreground mb-2 flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-green-600 dark:text-green-400" />
                   Move-in Date
                 </h2>
-                <p className="text-gray-700 text-base">
+                <p className="text-card-foreground/90 text-base">
                   {formatDate(profile.move_in_date)}
                   {profile.move_in_flexible && ' (Flexible)'}
                 </p>
@@ -192,9 +194,9 @@ export default function ProfileDetailPage() {
             )}
 
             {profile.work_schedule && (
-              <div className="p-5 bg-purple-50 rounded-xl border border-purple-100">
-                <h2 className="text-lg font-semibold text-gray-900 mb-2">Work Schedule</h2>
-                <Badge variant="secondary" className="capitalize text-sm px-3 py-1 bg-white border-gray-200">
+              <div className="p-5 bg-purple-50 dark:bg-purple-950/20 rounded-xl border border-purple-100 dark:border-purple-900/30">
+                <h2 className="text-lg font-semibold text-card-foreground mb-2">Work Schedule</h2>
+                <Badge variant="secondary" className="capitalize text-sm px-3 py-1">
                   {profile.work_schedule}
                 </Badge>
               </div>
