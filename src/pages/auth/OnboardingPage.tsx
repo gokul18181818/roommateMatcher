@@ -10,7 +10,17 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { useMutation } from '@tanstack/react-query'
+import { AlertCircle } from 'lucide-react'
 
 const profileSchema = z.object({
   full_name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -22,7 +32,7 @@ const profileSchema = z.object({
   job_title_other: z.string().optional(),
   company: z.string().min(1, 'Company is required'),
   linkedin_profile_url: z.string().url('Please enter a valid LinkedIn URL').min(1, 'LinkedIn profile URL is required'),
-  bio: z.string().min(150, 'Bio must be at least 150 characters').max(500, 'Bio must be less than 500 characters'),
+  bio: z.string().min(1, 'Bio is required').max(500, 'Bio must be less than 500 characters'),
   budget_min: z.number().optional(),
   budget_max: z.number().optional(),
   move_in_date: z.string().optional(),
@@ -112,6 +122,8 @@ export default function OnboardingPage() {
   const navigate = useNavigate()
   const { user } = useAuthStore()
   const [step, setStep] = useState(1)
+  const [errorDialogOpen, setErrorDialogOpen] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
 
   const { register, handleSubmit, formState: { errors }, watch, trigger, setValue } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -328,13 +340,21 @@ export default function OnboardingPage() {
     createProfile.mutate(data, {
       onError: (error: any) => {
         console.error('Profile creation failed:', error)
-        // Error will be displayed via the form
+        const message = error instanceof Error ? error.message : 'Failed to create profile. Please try again.'
+        setErrorMessage(message)
+        setErrorDialogOpen(true)
       },
     })
   }
 
   const handleFormError = (errors: any) => {
     console.log('Form validation errors:', errors)
+    // Get the first error message to display
+    const firstError = Object.values(errors)[0] as any
+    if (firstError?.message) {
+      setErrorMessage(firstError.message)
+      setErrorDialogOpen(true)
+    }
   }
 
   return (
@@ -347,15 +367,6 @@ export default function OnboardingPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {createProfile.isError && (
-            <div className="mb-4 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
-              <p className="text-sm text-destructive font-medium">
-                {createProfile.error instanceof Error 
-                  ? createProfile.error.message 
-                  : 'Failed to create profile. Please try again.'}
-              </p>
-            </div>
-          )}
           <form onSubmit={handleSubmit(onSubmit, handleFormError)} className="space-y-6">
             {step === 1 && (
               <div className="space-y-4">
@@ -483,9 +494,6 @@ export default function OnboardingPage() {
                     className="resize-none"
                   />
                   {errors.bio && <p className="text-sm text-destructive mt-1">{errors.bio.message}</p>}
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Minimum 150 characters required
-                  </p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -551,25 +559,35 @@ export default function OnboardingPage() {
                     {createProfile.isPending ? 'Creating Profile...' : 'Complete Profile'}
                   </Button>
                 </div>
-                {Object.keys(errors).length > 0 && (
-                  <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p className="text-sm text-yellow-800 font-medium mb-1">Please fix the following errors:</p>
-                    <ul className="text-sm text-yellow-700 list-disc list-inside">
-                      {errors.full_name && <li>Full Name: {errors.full_name.message}</li>}
-                      {errors.date_of_birth && <li>Date of Birth: {errors.date_of_birth.message}</li>}
-                      {errors.city && <li>City: {errors.city.message}</li>}
-                      {errors.state && <li>State: {errors.state.message}</li>}
-                      {errors.job_title && <li>Job Title: {errors.job_title.message}</li>}
-                      {errors.company && <li>Company: {errors.company.message}</li>}
-                      {errors.bio && <li>Bio: {errors.bio.message}</li>}
-                    </ul>
-                  </div>
-                )}
               </div>
             )}
           </form>
         </CardContent>
       </Card>
+
+      <AlertDialog open={errorDialogOpen} onOpenChange={setErrorDialogOpen}>
+        <AlertDialogContent className="max-w-md rounded-2xl">
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-destructive/10">
+                <AlertCircle className="h-5 w-5 text-destructive" />
+              </div>
+              <AlertDialogTitle className="text-lg">Oops! Something's missing</AlertDialogTitle>
+            </div>
+            <AlertDialogDescription className="text-base leading-relaxed">
+              {errorMessage}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction
+              onClick={() => setErrorDialogOpen(false)}
+              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold shadow-lg rounded-xl py-5"
+            >
+              Got it, let me fix that
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
