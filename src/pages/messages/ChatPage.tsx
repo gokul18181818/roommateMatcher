@@ -281,28 +281,20 @@ export default function ChatPage() {
                     )}
                     {!isOwn && isConsecutive && <div className="w-8" />}
                     <div className={`flex flex-col ${isOwn ? 'items-end' : 'items-start'} max-w-[65%] sm:max-w-[55%]`}>
-                      <div className="flex items-end gap-1.5">
-                        {!isOwn && (
-                          <span className="text-[11px] text-muted-foreground/70 whitespace-nowrap pb-0.5">
-                            {formatFullTime(msg.created_at)}
-                          </span>
-                        )}
-                        <div
-                          className={`rounded-2xl px-3.5 py-2 shadow-sm ${
-                            isOwn
-                              ? 'bg-primary text-primary-foreground rounded-br-sm'
-                              : 'bg-muted/80 text-foreground rounded-bl-sm'
-                          }`}
-                        >
-                          <p className="text-[15px] leading-relaxed whitespace-pre-wrap break-words">
-                            {msg.content}
-                          </p>
-                        </div>
+                      <div
+                        className={`rounded-2xl px-3.5 py-2 shadow-sm ${
+                          isOwn
+                            ? 'bg-primary text-primary-foreground rounded-br-sm'
+                            : 'bg-muted/80 text-foreground rounded-bl-sm'
+                        }`}
+                      >
+                        <p className="text-[15px] leading-relaxed whitespace-pre-wrap break-words">
+                          {msg.content}
+                        </p>
+                      </div>
+                      <div className={`flex items-center gap-1 mt-0.5 px-1 ${isOwn ? 'flex-row-reverse' : ''}`}>
                         {isOwn && (
-                          <div className="flex items-center gap-1 pb-0.5">
-                            <span className="text-[11px] text-muted-foreground/70 whitespace-nowrap">
-                              {formatFullTime(msg.created_at)}
-                            </span>
+                          <>
                             {status === 'read' ? (
                               <CheckCheck className="h-3.5 w-3.5 text-primary" />
                             ) : status === 'delivered' ? (
@@ -310,7 +302,15 @@ export default function ChatPage() {
                             ) : (
                               <Check className="h-3.5 w-3.5 text-muted-foreground/50" />
                             )}
-                          </div>
+                            <span className="text-[11px] text-muted-foreground/70 whitespace-nowrap">
+                              {formatFullTime(msg.created_at)}
+                            </span>
+                          </>
+                        )}
+                        {!isOwn && (
+                          <span className="text-[11px] text-muted-foreground/70 whitespace-nowrap">
+                            {formatFullTime(msg.created_at)}
+                          </span>
                         )}
                       </div>
                     </div>
