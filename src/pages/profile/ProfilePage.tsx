@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Avatar } from '@/components/ui/avatar'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Edit, MapPin, Calendar, DollarSign, Trash2 } from 'lucide-react'
+import { InstagramIcon } from '@/components/ui/InstagramIcon'
 import { formatDate } from '@/lib/utils'
 import CompanyLogo from '@/components/ui/CompanyLogo'
 import JobTitleIcon from '@/components/ui/JobTitleIcon'
@@ -105,36 +106,58 @@ export default function ProfilePage() {
             <div className="text-center">
               <h2 className="text-2xl font-bold text-card-foreground mb-1">{profile.full_name}</h2>
               <p className="text-lg text-muted-foreground mb-3">{profile.age} years old</p>
-              {profile.linkedin_profile_url ? (
-                <a
-                  href={profile.linkedin_profile_url.startsWith('http') ? profile.linkedin_profile_url : `https://${profile.linkedin_profile_url}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => {
-                    const url = profile.linkedin_profile_url?.startsWith('http') 
-                      ? profile.linkedin_profile_url 
-                      : `https://${profile.linkedin_profile_url}`
-                    console.log('Opening LinkedIn URL:', url)
-                    if (!url || url === 'https://' || url === 'http://') {
-                      e.preventDefault()
-                      console.error('Invalid LinkedIn URL:', profile.linkedin_profile_url)
-                      return false
-                    }
-                  }}
-                  className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors cursor-pointer underline z-[60] relative"
-                  style={{ position: 'relative', zIndex: 60 }}
-                >
-                  <img src="/linkedin-logo.svg" alt="LinkedIn" className="h-5 w-5" />
-                  <span className="text-sm font-medium">View LinkedIn Profile</span>
-                </a>
-              ) : (
-                <Link
-                  to="/my-profile/edit"
-                  className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors text-sm"
-                >
-                  <span>Add LinkedIn Profile</span>
-                </Link>
-              )}
+              <div className="flex flex-col items-center gap-2">
+                {profile.linkedin_profile_url ? (
+                  <a
+                    href={profile.linkedin_profile_url.startsWith('http') ? profile.linkedin_profile_url : `https://${profile.linkedin_profile_url}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => {
+                      const url = profile.linkedin_profile_url?.startsWith('http') 
+                        ? profile.linkedin_profile_url 
+                        : `https://${profile.linkedin_profile_url}`
+                      console.log('Opening LinkedIn URL:', url)
+                      if (!url || url === 'https://' || url === 'http://') {
+                        e.preventDefault()
+                        console.error('Invalid LinkedIn URL:', profile.linkedin_profile_url)
+                        return false
+                      }
+                    }}
+                    className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors cursor-pointer underline z-[60] relative"
+                    style={{ position: 'relative', zIndex: 60 }}
+                  >
+                    <img src="/linkedin-logo.svg" alt="LinkedIn" className="h-5 w-5" />
+                    <span className="text-sm font-medium">View LinkedIn Profile</span>
+                  </a>
+                ) : (
+                  <Link
+                    to="/my-profile/edit"
+                    className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors text-sm"
+                  >
+                    <span>Add LinkedIn Profile</span>
+                  </Link>
+                )}
+                {profile.instagram_handle ? (
+                  <a
+                    href={`https://www.instagram.com/${profile.instagram_handle.replace('@', '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors cursor-pointer underline z-[60] relative"
+                    style={{ position: 'relative', zIndex: 60 }}
+                  >
+                    <InstagramIcon className="h-5 w-5" />
+                    <span className="text-sm font-medium">@{profile.instagram_handle.replace('@', '')}</span>
+                  </a>
+                ) : (
+                  <Link
+                    to="/my-profile/edit"
+                    className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors text-sm"
+                  >
+                    <InstagramIcon className="h-5 w-5" />
+                    <span>Add Instagram</span>
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
 

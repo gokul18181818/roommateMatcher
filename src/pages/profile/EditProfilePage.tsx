@@ -79,6 +79,7 @@ const profileSchema = z.object({
   industry_other: z.string().optional(),
   work_schedule: z.enum(['remote', 'hybrid', 'in-office']).optional().nullable(),
   linkedin_profile_url: z.string().url('Please enter a valid LinkedIn URL').min(1, 'LinkedIn profile URL is required'),
+  instagram_handle: z.string().optional().or(z.literal('')),
 }).refine(
   (data) => {
     if (data.city === 'Other' && (!data.city_other || data.city_other.trim() === '')) {
@@ -133,6 +134,7 @@ export default function EditProfilePage() {
       industry_other: profile.industry && !COMMON_INDUSTRIES.includes(profile.industry) ? profile.industry : '',
       work_schedule: profile.work_schedule,
       linkedin_profile_url: profile.linkedin_profile_url || '',
+      instagram_handle: profile.instagram_handle || '',
     } : undefined,
   })
 
@@ -157,6 +159,7 @@ export default function EditProfilePage() {
       city: finalCity,
       job_title: finalJobTitle,
       industry: finalIndustry,
+      instagram_handle: data.instagram_handle?.trim().replace(/^@+/, '') || null,
     }
 
     updateProfile.mutate(submitData, {
@@ -285,6 +288,23 @@ export default function EditProfilePage() {
               )}
               <p className="text-xs text-muted-foreground mt-1">
                 Required - Your LinkedIn profile URL
+              </p>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium mb-2 block">
+                Instagram Handle (Optional)
+              </label>
+              <Input
+                {...register('instagram_handle')}
+                placeholder="@yourhandle"
+                type="text"
+              />
+              {errors.instagram_handle && (
+                <p className="text-sm text-destructive mt-1">{errors.instagram_handle.message}</p>
+              )}
+              <p className="text-xs text-muted-foreground mt-1">
+                Optional - Your Instagram handle (without @)
               </p>
             </div>
 

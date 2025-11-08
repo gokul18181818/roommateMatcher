@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, MapPin, Calendar, DollarSign, MessageSquare } from 'lucide-react'
+import { InstagramIcon } from '@/components/ui/InstagramIcon'
 import { formatDate } from '@/lib/utils'
 import CompanyLogo from '@/components/ui/CompanyLogo'
 import JobTitleIcon from '@/components/ui/JobTitleIcon'
@@ -76,17 +77,30 @@ export default function ProfileDetailPage() {
             <div className="text-center space-y-2">
               <h1 className="text-4xl font-bold text-card-foreground tracking-tight">{profile.full_name}</h1>
               <p className="text-xl text-muted-foreground">{profile.age} years old</p>
-              {profile.linkedin_profile_url && (
-                <a
-                  href={profile.linkedin_profile_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors mt-2 font-medium"
-                >
-                  <img src="/linkedin-logo.svg" alt="LinkedIn" className="h-5 w-5" />
-                  <span className="text-sm">View LinkedIn Profile</span>
-                </a>
-              )}
+              <div className="flex flex-col items-center gap-2 mt-2">
+                {profile.linkedin_profile_url && (
+                  <a
+                    href={profile.linkedin_profile_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors font-medium"
+                  >
+                    <img src="/linkedin-logo.svg" alt="LinkedIn" className="h-5 w-5" />
+                    <span className="text-sm">View LinkedIn Profile</span>
+                  </a>
+                )}
+                {profile.instagram_handle && (
+                  <a
+                    href={`https://www.instagram.com/${profile.instagram_handle.replace('@', '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors font-medium"
+                  >
+                    <InstagramIcon className="h-5 w-5" />
+                    <span className="text-sm">@{profile.instagram_handle.replace('@', '')}</span>
+                  </a>
+                )}
+              </div>
             </div>
           </div>
 
