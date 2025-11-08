@@ -47,8 +47,13 @@ export default function FeedbackPage() {
 
     try {
       // Check if EmailJS is configured
-      if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
-        throw new Error('Email service is not configured. Please contact support.')
+      const missingVars = []
+      if (!EMAILJS_SERVICE_ID) missingVars.push('VITE_EMAILJS_SERVICE_ID')
+      if (!EMAILJS_TEMPLATE_ID) missingVars.push('VITE_EMAILJS_TEMPLATE_ID')
+      if (!EMAILJS_PUBLIC_KEY) missingVars.push('VITE_EMAILJS_PUBLIC_KEY')
+      
+      if (missingVars.length > 0) {
+        throw new Error(`Email service configuration missing: ${missingVars.join(', ')}. Please ensure environment variables are set and the site has been redeployed.`)
       }
 
       // Prepare email template parameters
