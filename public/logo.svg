@@ -1,17 +1,19 @@
 <svg width="200" height="120" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
-  <!-- House outline in light blue -->
-  <path d="M 100 20 L 140 40 L 140 80 L 60 80 L 60 40 Z" fill="none" stroke="#60A5FA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- House outline in medium teal -->
+  <path d="M 100 20 L 140 40 L 140 80 L 60 80 L 60 40 Z" fill="none" stroke="#42B8B8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
   
-  <!-- Building inside house - darker blue -->
-  <g fill="#2A5C8D" stroke="#2A5C8D" stroke-width="1">
-    <!-- Main building rectangle -->
-    <rect x="75" y="50" width="50" height="25" rx="2"/>
-    <!-- Windows on building -->
-    <rect x="82" y="55" width="8" height="8" fill="#60A5FA" rx="1"/>
-    <rect x="95" y="55" width="8" height="8" fill="#60A5FA" rx="1"/>
-    <rect x="108" y="55" width="8" height="8" fill="#60A5FA" rx="1"/>
-    <!-- Door -->
-    <rect x="90" y="65" width="10" height="10" fill="#60A5FA" rx="1"/>
+  <!-- Ladder inside house - deep blue -->
+  <g stroke="#2A5C8D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Left rail -->
+    <line x1="85" y1="75" x2="85" y2="45"/>
+    <!-- Right rail -->
+    <line x1="115" y1="75" x2="115" y2="45"/>
+    <!-- Rungs (5 rungs, evenly spaced, slightly tapered) -->
+    <line x1="85" y1="70" x2="115" y2="70"/>
+    <line x1="86" y1="64" x2="114" y2="64"/>
+    <line x1="87" y1="58" x2="113" y2="58"/>
+    <line x1="88" y1="52" x2="112" y2="52"/>
+    <line x1="89" y1="46" x2="111" y2="46"/>
   </g>
   
   <!-- "CareerCrib" text -->
