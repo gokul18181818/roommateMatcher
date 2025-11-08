@@ -373,20 +373,26 @@ export default function OnboardingPage() {
             {step === 1 && (
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Full Name</label>
+                  <label className="text-sm font-medium mb-2 block">
+                    Full Name <span className="text-destructive">*</span>
+                  </label>
                   <Input {...register('full_name')} placeholder="John Doe" />
                   {errors.full_name && <p className="text-sm text-destructive mt-1">{errors.full_name.message}</p>}
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Date of Birth</label>
+                  <label className="text-sm font-medium mb-2 block">
+                    Date of Birth <span className="text-destructive">*</span>
+                  </label>
                   <Input type="date" {...register('date_of_birth')} />
                   {errors.date_of_birth && <p className="text-sm text-destructive mt-1">{errors.date_of_birth.message}</p>}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium mb-2 block">City</label>
+                    <label className="text-sm font-medium mb-2 block">
+                      City <span className="text-destructive">*</span>
+                    </label>
                     <select {...register('city')} className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm">
                       <option value="">Select city...</option>
                       {COMMON_CITIES.map(city => (
@@ -402,7 +408,9 @@ export default function OnboardingPage() {
                     )}
                   </div>
                   <div>
-                    <label className="text-sm font-medium mb-2 block">State</label>
+                    <label className="text-sm font-medium mb-2 block">
+                      State <span className="text-destructive">*</span>
+                    </label>
                     <select {...register('state')} className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm">
                       <option value="">Select state...</option>
                       {US_STATES.map(state => (
@@ -414,7 +422,9 @@ export default function OnboardingPage() {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Job Title</label>
+                  <label className="text-sm font-medium mb-2 block">
+                    Job Title <span className="text-destructive">*</span>
+                  </label>
                   <select {...register('job_title')} className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm">
                     <option value="">Select job title...</option>
                     {COMMON_JOB_TITLES.map(title => (
@@ -431,7 +441,9 @@ export default function OnboardingPage() {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Company</label>
+                  <label className="text-sm font-medium mb-2 block">
+                    Company <span className="text-destructive">*</span>
+                  </label>
                   <Input {...register('company')} placeholder="Google" />
                   {errors.company && <p className="text-sm text-destructive mt-1">{errors.company.message}</p>}
                 </div>
@@ -467,7 +479,9 @@ export default function OnboardingPage() {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Industry</label>
+                  <label className="text-sm font-medium mb-2 block">
+                    Industry <span className="text-destructive">*</span>
+                  </label>
                   <select {...register('industry')} className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm">
                     <option value="">Select industry...</option>
                     {COMMON_INDUSTRIES.map(industry => (
@@ -502,7 +516,7 @@ export default function OnboardingPage() {
               <div className="space-y-4">
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Bio <span className="text-muted-foreground">({bioLength}/500)</span>
+                    Bio <span className="text-destructive">*</span> <span className="text-muted-foreground">({bioLength}/500)</span>
                   </label>
                   <Textarea
                     {...register('bio')}
