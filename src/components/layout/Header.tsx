@@ -19,16 +19,16 @@ export default function Header() {
           </div>
         </Link>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center gap-2 md:gap-4">
           <ThemeToggle />
           <Link to="/my-profile">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="h-9 w-9">
               <User className="h-5 w-5" />
             </Button>
           </Link>
-          <Button variant="ghost" size="sm" onClick={signOut}>
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign Out
+          <Button variant="ghost" size="sm" onClick={signOut} className="h-9">
+            <LogOut className="h-4 w-4 mr-1 md:mr-2" />
+            <span className="hidden sm:inline">Sign Out</span>
           </Button>
         </div>
       </div>

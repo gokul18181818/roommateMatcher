@@ -47,7 +47,7 @@ export function TubelightNavBar({ items, className }: TubelightNavBarProps) {
         className,
       )}
     >
-      <div className="flex items-center gap-3 bg-card/95 border border-border backdrop-blur-lg py-1 px-1 rounded-full shadow-lg pointer-events-auto">
+      <div className="flex items-center gap-2 bg-card/95 border border-border backdrop-blur-lg py-1 px-1 rounded-full shadow-lg pointer-events-auto">
         {items.map((item) => {
           const Icon = item.icon
           const isActive = activeTab === item.name
@@ -57,7 +57,7 @@ export function TubelightNavBar({ items, className }: TubelightNavBarProps) {
               key={item.name}
               to={item.url}
               className={cn(
-                "relative cursor-pointer text-sm font-semibold px-6 py-2 rounded-full transition-colors",
+                "relative cursor-pointer text-sm font-semibold px-3 py-2 md:px-6 rounded-full transition-colors",
                 "text-foreground/80 hover:text-primary",
                 isActive && "bg-muted text-primary",
               )}
