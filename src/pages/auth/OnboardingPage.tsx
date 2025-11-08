@@ -33,7 +33,6 @@ const profileSchema = z.object({
   company: z.string().min(1, 'Company is required'),
   employment_type: z.enum(['intern', 'new_grad']).optional().nullable(),
   linkedin_profile_url: z.string().url('Please enter a valid LinkedIn URL').min(1, 'LinkedIn profile URL is required'),
-  instagram_handle: z.string().optional().or(z.literal('')),
   bio: z.string().min(100, 'Bio must be at least 100 characters').max(500, 'Bio must be less than 500 characters'),
   budget_min: z.number().optional(),
   budget_max: z.number().optional(),
@@ -302,7 +301,6 @@ export default function OnboardingPage() {
         id: currentUser.id,
         linkedin_id: linkedinId || currentUser.id,
         linkedin_profile_url: linkedinProfileUrl,
-        instagram_handle: data.instagram_handle?.trim().replace(/^@+/, '') || null,
         full_name: data.full_name,
         date_of_birth: data.date_of_birth,
         age: calculatedAge,
@@ -465,21 +463,6 @@ export default function OnboardingPage() {
                   {errors.linkedin_profile_url && <p className="text-sm text-destructive mt-1">{errors.linkedin_profile_url.message}</p>}
                   <p className="text-xs text-muted-foreground mt-1">
                     Required - Your LinkedIn profile URL
-                  </p>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Instagram Handle (Optional)
-                  </label>
-                  <Input
-                    {...register('instagram_handle')}
-                    type="text"
-                    placeholder="@yourhandle"
-                  />
-                  {errors.instagram_handle && <p className="text-sm text-destructive mt-1">{errors.instagram_handle.message}</p>}
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Optional - Your Instagram handle (without @)
                   </p>
                 </div>
 

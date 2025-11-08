@@ -7,7 +7,6 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, MapPin, Calendar, DollarSign, MessageSquare } from 'lucide-react'
-import { InstagramIcon } from '@/components/ui/InstagramIcon'
 import { formatDate } from '@/lib/utils'
 import CompanyLogo from '@/components/ui/CompanyLogo'
 import JobTitleIcon from '@/components/ui/JobTitleIcon'
@@ -87,17 +86,6 @@ export default function ProfileDetailPage() {
                   >
                     <img src="/linkedin-logo.svg" alt="LinkedIn" className="h-5 w-5" />
                     <span className="text-sm">View LinkedIn Profile</span>
-                  </a>
-                )}
-                {profile.instagram_handle && typeof profile.instagram_handle === 'string' && profile.instagram_handle.trim().length > 0 && (
-                  <a
-                    href={`https://www.instagram.com/${profile.instagram_handle.replace(/^@+/g, '')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors font-medium"
-                  >
-                    <InstagramIcon className="h-5 w-5 text-primary" />
-                    <span className="text-sm">@{profile.instagram_handle.replace(/^@+/g, '')}</span>
                   </a>
                 )}
               </div>

@@ -4,7 +4,6 @@ export interface Profile {
   updated_at: string
   linkedin_id: string
   linkedin_profile_url: string | null
-  instagram_handle: string | null
   full_name: string
   date_of_birth: string
   age: number

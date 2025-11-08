@@ -10,7 +10,6 @@ import { Badge } from '@/components/ui/badge'
 import { Avatar } from '@/components/ui/avatar'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Edit, MapPin, Calendar, DollarSign, Trash2 } from 'lucide-react'
-import { InstagramIcon } from '@/components/ui/InstagramIcon'
 import { formatDate } from '@/lib/utils'
 import CompanyLogo from '@/components/ui/CompanyLogo'
 import JobTitleIcon from '@/components/ui/JobTitleIcon'
@@ -135,26 +134,6 @@ export default function ProfilePage() {
                     className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors text-sm"
                   >
                     <span>Add LinkedIn Profile</span>
-                  </Link>
-                )}
-                {profile.instagram_handle && typeof profile.instagram_handle === 'string' && profile.instagram_handle.trim().length > 0 ? (
-                  <a
-                    href={`https://www.instagram.com/${profile.instagram_handle.replace(/^@+/g, '')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors cursor-pointer underline z-[60] relative"
-                    style={{ position: 'relative', zIndex: 60 }}
-                  >
-                    <InstagramIcon className="h-5 w-5 text-primary" />
-                    <span className="text-sm font-medium">@{profile.instagram_handle.replace(/^@+/g, '')}</span>
-                  </a>
-                ) : (
-                  <Link
-                    to="/my-profile/edit"
-                    className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors text-sm"
-                  >
-                    <InstagramIcon className="h-5 w-5 text-muted-foreground" />
-                    <span>Add Instagram</span>
                   </Link>
                 )}
               </div>
