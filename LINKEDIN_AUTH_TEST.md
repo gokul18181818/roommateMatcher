@@ -103,7 +103,7 @@ After successful login, open DevTools (F12) and check:
 
 ### 2. Check Supabase Dashboard
 
-1. Go to: https://supabase.com/dashboard/project/anwkkoecmsobccibnysf/auth/users
+1. Go to: https://supabase.com/dashboard/project/YOUR_PROJECT_ID/auth/users
 2. You should see **your user** in the Users table with:
    - Email from LinkedIn
    - LinkedIn user metadata
@@ -138,7 +138,7 @@ You should see your LinkedIn data!
 1. Go to LinkedIn Developer Portal → Auth
 2. Verify redirect URL is **exactly**:
    ```
-   https://anwkkoecmsobccibnysf.supabase.co/auth/v1/callback
+   https://YOUR_PROJECT_ID.supabase.co/auth/v1/callback
    ```
 3. No trailing slash, no extra parameters
 

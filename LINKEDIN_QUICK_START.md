@@ -2,11 +2,11 @@
 
 ## Your Exact URLs
 
-**Supabase Project URL**: `https://anwkkoecmsobccibnysf.supabase.co`
+**Supabase Project URL**: `https://YOUR_PROJECT_ID.supabase.co`
 
 **Supabase Redirect URL** (add this to LinkedIn): 
 ```
-https://anwkkoecmsobccibnysf.supabase.co/auth/v1/callback
+https://YOUR_PROJECT_ID.supabase.co/auth/v1/callback
 ```
 
 **Local Development Redirect URL** (also add to LinkedIn):
@@ -30,7 +30,7 @@ http://localhost:5173/auth/callback
 - Click **"Add redirect URL"**
 - Add these TWO URLs:
   1. `http://localhost:5173/auth/callback`
-  2. `https://anwkkoecmsobccibnysf.supabase.co/auth/v1/callback`
+  2. `https://YOUR_PROJECT_ID.supabase.co/auth/v1/callback`
 - Click **"Update"** after each
 
 ### 3. Get Credentials (30 seconds)
@@ -45,7 +45,7 @@ http://localhost:5173/auth/callback
 - Submit the form (approval takes 1-2 days, but you can test locally)
 
 ### 5. Configure Supabase (1 minute)
-- Go to: https://supabase.com/dashboard/project/anwkkoecmsobccibnysf
+- Go to: https://supabase.com/dashboard/project/YOUR_PROJECT_ID
 - Click **Authentication** → **Providers**
 - Find **LinkedIn** → Toggle **ON**
 - Paste:
@@ -62,7 +62,7 @@ http://localhost:5173/auth/callback
 
 1. **API Approval**: LinkedIn may take 1-2 days to approve API access. You can still test locally during this time.
 
-2. **Redirect URL Must Match Exactly**: The Supabase redirect URL (`https://anwkkoecmsobccibnysf.supabase.co/auth/v1/callback`) MUST be added to LinkedIn's redirect URLs list.
+2. **Redirect URL Must Match Exactly**: The Supabase redirect URL (`https://YOUR_PROJECT_ID.supabase.co/auth/v1/callback`) MUST be added to LinkedIn's redirect URLs list.
 
 3. **For Production**: When deploying, add your production domain's redirect URL to both LinkedIn and Supabase.
 

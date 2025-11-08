@@ -75,7 +75,7 @@
 4. **Enter LinkedIn Credentials**
    - **Client ID (OAuth 2.0 Client ID)**: Paste your LinkedIn Client ID
    - **Client Secret (OAuth 2.0 Client Secret)**: Paste your LinkedIn Client Secret
-   - **Redirect URL**: Copy the URL shown (it will be something like `https://anwkkoecmsobccibnysf.supabase.co/auth/v1/callback`)
+   - **Redirect URL**: Copy the URL shown (it will be something like `https://YOUR_PROJECT_ID.supabase.co/auth/v1/callback`)
 
 5. **Save the Redirect URL**
    - Copy the Supabase redirect URL
