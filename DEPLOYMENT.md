@@ -37,3 +37,30 @@ Add these environment variables:
 - **Publish Directory**: `dist`
 - **Node Version**: Auto-detected (or set to 18+)
 
+## LinkedIn OAuth Configuration for Production
+
+After deploying to Netlify, you need to add your production redirect URLs:
+
+### 1. LinkedIn Developer Portal
+
+1. Go to: https://www.linkedin.com/developers/apps
+2. Select your app
+3. Go to **Auth** tab
+4. Under **Redirect URLs**, add:
+   - `https://careercrib.netlify.app/auth/callback`
+   - `https://YOUR_PROJECT_ID.supabase.co/auth/v1/callback` (your Supabase redirect URL)
+5. Click **Update**
+
+### 2. Supabase Configuration
+
+1. Go to your Supabase Dashboard → **Authentication** → **URL Configuration**
+2. Add to **Redirect URLs**:
+   - `https://careercrib.netlify.app/auth/callback`
+3. Save
+
+### Important Notes
+
+- The code automatically uses `window.location.origin`, so it will work on both localhost and Netlify
+- Make sure BOTH LinkedIn and Supabase have the production redirect URLs added
+- The Supabase redirect URL (`https://YOUR_PROJECT_ID.supabase.co/auth/v1/callback`) must be added to LinkedIn's allowed redirect URLs
+
