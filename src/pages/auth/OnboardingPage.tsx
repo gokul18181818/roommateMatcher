@@ -32,7 +32,7 @@ const profileSchema = z.object({
   job_title_other: z.string().optional(),
   company: z.string().min(1, 'Company is required'),
   linkedin_profile_url: z.string().url('Please enter a valid LinkedIn URL').min(1, 'LinkedIn profile URL is required'),
-  bio: z.string().min(1, 'Bio is required').max(500, 'Bio must be less than 500 characters'),
+  bio: z.string().min(100, 'Bio must be at least 100 characters').max(500, 'Bio must be less than 500 characters'),
   budget_min: z.number().optional(),
   budget_max: z.number().optional(),
   move_in_date: z.string().optional(),
