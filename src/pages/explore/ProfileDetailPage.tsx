@@ -59,133 +59,151 @@ export default function ProfileDetailPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <Button variant="ghost" onClick={() => navigate('/explore')} className="mb-4">
+    <div className="max-w-4xl mx-auto space-y-6 pb-8">
+      <Button 
+        variant="ghost" 
+        onClick={() => navigate('/explore')} 
+        className="mb-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg"
+      >
         <ArrowLeft className="h-4 w-4 mr-2" />
-        Back
+        Back to Explore
       </Button>
 
-      <Card className="border-0 shadow-lg overflow-hidden">
-        <CardContent className="p-6">
+      <Card className="border border-gray-200 shadow-lg overflow-hidden bg-white">
+        <CardContent className="p-8">
           {/* Profile Header with Circular Avatar */}
-          <div className="flex flex-col items-center mb-6">
-            <div className="relative mb-4">
+          <div className="flex flex-col items-center mb-8">
+            <div className="relative mb-5">
               <Avatar
                 src={profile.profile_photo_url || null}
                 fallback={profile.full_name}
-                className="h-32 w-32 border-4 border-white shadow-lg"
+                className="h-36 w-36 border-4 border-white shadow-xl"
               />
               {profile.is_verified && (
-                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
-                  <Badge variant="default" className="bg-blue-600">Verified</Badge>
+                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2">
+                  <Badge className="bg-blue-600 text-white shadow-md text-xs px-3 py-1 font-medium">
+                    ✓ Verified
+                  </Badge>
                 </div>
               )}
             </div>
-            <div className="text-center">
-              <h1 className="text-3xl font-bold text-gray-900 mb-1">{profile.full_name}</h1>
-              <p className="text-lg text-muted-foreground mb-3">{profile.age} years old</p>
+            <div className="text-center space-y-2">
+              <h1 className="text-4xl font-bold text-gray-900 tracking-tight">{profile.full_name}</h1>
+              <p className="text-xl text-gray-500">{profile.age} years old</p>
               {profile.linkedin_profile_url && (
                 <a
                   href={profile.linkedin_profile_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
+                  className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors mt-2 font-medium"
                 >
                   <Linkedin className="h-5 w-5" />
-                  <span className="text-sm font-medium">View LinkedIn Profile</span>
+                  <span className="text-sm">View LinkedIn Profile</span>
                 </a>
               )}
             </div>
           </div>
 
-          <div className="flex items-center justify-center gap-2 mb-6">
+          <div className="flex items-center justify-center gap-3 mb-8">
             <Button
               onClick={() => bookmarkMutation.mutate()}
               variant="outline"
+              className="px-6 py-2.5 border-gray-200 hover:bg-gray-50 rounded-lg font-medium"
             >
               <Bookmark className="h-4 w-4 mr-2" />
               Bookmark
             </Button>
             <Link to={`/messages?user=${profile.id}`}>
-              <Button>
+              <Button className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-sm hover:shadow-md transition-all">
                 <MessageSquare className="h-4 w-4 mr-2" />
                 Message
               </Button>
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div className="flex items-center gap-3">
-              <Briefcase className="h-5 w-5 text-muted-foreground" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+              <div className="p-2 bg-white rounded-lg shadow-sm">
+                <Briefcase className="h-5 w-5 text-gray-600" />
+              </div>
               <div>
-                <p className="text-sm text-muted-foreground">Job Title</p>
-                <p className="font-medium">{profile.job_title}</p>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Job Title</p>
+                <p className="text-base font-semibold text-gray-900">{profile.job_title}</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Building2 className="h-5 w-5 text-muted-foreground" />
+            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+              <div className="p-2 bg-white rounded-lg shadow-sm">
+                <Building2 className="h-5 w-5 text-gray-600" />
+              </div>
               <div>
-                <p className="text-sm text-muted-foreground">Company</p>
-                <p className="font-medium">{profile.company}</p>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Company</p>
+                <p className="text-base font-semibold text-gray-900">{profile.company}</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <MapPin className="h-5 w-5 text-muted-foreground" />
+            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+              <div className="p-2 bg-white rounded-lg shadow-sm">
+                <MapPin className="h-5 w-5 text-gray-600" />
+              </div>
               <div>
-                <p className="text-sm text-muted-foreground">Location</p>
-                <p className="font-medium">{profile.city}, {profile.state}</p>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Location</p>
+                <p className="text-base font-semibold text-gray-900">{profile.city}, {profile.state}</p>
               </div>
             </div>
             {profile.industry && (
-              <div className="flex items-center gap-3">
-                <Badge variant="outline">{profile.industry}</Badge>
+              <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+                <div className="p-2 bg-white rounded-lg shadow-sm">
+                  <Badge variant="outline" className="border-gray-300 text-gray-700 font-medium">{profile.industry}</Badge>
+                </div>
               </div>
             )}
           </div>
 
           {profile.bio && (
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold mb-3">About</h2>
-              <p className="text-gray-700 leading-relaxed">{profile.bio}</p>
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">About</h2>
+              <p className="text-gray-700 leading-relaxed text-base">{profile.bio}</p>
             </div>
           )}
 
-          {(profile.budget_min || profile.budget_max) && (
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
-                <DollarSign className="h-5 w-5" />
-                Budget
-              </h2>
-              <p className="text-gray-700">
-                ${profile.budget_min || 'Any'} - ${profile.budget_max || 'Any'} / month
-              </p>
-            </div>
-          )}
+          <div className="space-y-6">
+            {(profile.budget_min || profile.budget_max) && (
+              <div className="p-5 bg-blue-50 rounded-xl border border-blue-100">
+                <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                  <DollarSign className="h-5 w-5 text-blue-600" />
+                  Budget
+                </h2>
+                <p className="text-gray-700 text-base">
+                  ${profile.budget_min || 'Any'} - ${profile.budget_max || 'Any'} / month
+                </p>
+              </div>
+            )}
 
-          {profile.move_in_date && (
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Move-in Date
-              </h2>
-              <p className="text-gray-700">
-                {formatDate(profile.move_in_date)}
-                {profile.move_in_flexible && ' (Flexible)'}
-              </p>
-            </div>
-          )}
+            {profile.move_in_date && (
+              <div className="p-5 bg-green-50 rounded-xl border border-green-100">
+                <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-green-600" />
+                  Move-in Date
+                </h2>
+                <p className="text-gray-700 text-base">
+                  {formatDate(profile.move_in_date)}
+                  {profile.move_in_flexible && ' (Flexible)'}
+                </p>
+              </div>
+            )}
 
-          {profile.work_schedule && (
-            <div>
-              <h2 className="text-xl font-semibold mb-3">Work Schedule</h2>
-              <Badge variant="secondary" className="capitalize">
-                {profile.work_schedule}
-              </Badge>
-            </div>
-          )}
+            {profile.work_schedule && (
+              <div className="p-5 bg-purple-50 rounded-xl border border-purple-100">
+                <h2 className="text-lg font-semibold text-gray-900 mb-2">Work Schedule</h2>
+                <Badge variant="secondary" className="capitalize text-sm px-3 py-1 bg-white border-gray-200">
+                  {profile.work_schedule}
+                </Badge>
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>
   )
 }
+
 
