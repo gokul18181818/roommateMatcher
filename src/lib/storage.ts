@@ -23,6 +23,10 @@ export async function uploadProfilePhoto(
     })
 
   if (error) {
+    // Provide user-friendly error message for bucket not found
+    if (error.message.includes('Bucket not found') || error.message.includes('bucket')) {
+      throw new Error('Storage bucket not configured. Please contact support or check Supabase storage settings.')
+    }
     throw new Error(`Failed to upload photo: ${error.message}`)
   }
 
