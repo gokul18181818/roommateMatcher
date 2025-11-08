@@ -46,42 +46,17 @@ export const SignInPage: React.FC<SignInPageProps> = ({
   const animationFrameIdRef = useRef<number | null>(null)
 
   const resolvedCanvasColorsRef = useRef({
-    strokeStyle: { r: 128, g: 128, b: 128 },
+    strokeStyle: { r: 0, g: 0, b: 0 }, // Default to black (light mode)
   })
-
-  // Parse RGB color helper
-  const parseRgbColor = (colorString: string | null) => {
-    if (!colorString) return null
-    const match = colorString.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)/)
-    if (match) {
-      return {
-        r: parseInt(match[1], 10),
-        g: parseInt(match[2], 10),
-        b: parseInt(match[3], 10),
-      }
-    }
-    return null
-  }
 
   // Update resolved colors based on theme
   useEffect(() => {
-    const tempElement = document.createElement('div')
-    tempElement.style.display = 'none'
-    document.body.appendChild(tempElement)
-
     const updateResolvedColors = () => {
-      tempElement.style.color = 'var(--foreground)'
-      const computedFgColor = getComputedStyle(tempElement).color
-      const parsedFgColor = parseRgbColor(computedFgColor)
-
-      if (parsedFgColor) {
-        resolvedCanvasColorsRef.current.strokeStyle = parsedFgColor
-      } else {
-        const isDarkMode = document.documentElement.classList.contains('dark')
-        resolvedCanvasColorsRef.current.strokeStyle = isDarkMode
-          ? { r: 250, g: 250, b: 250 }
-          : { r: 10, g: 10, b: 10 }
-      }
+      const isDarkMode = document.documentElement.classList.contains('dark')
+      // White in dark mode, black in light mode for proper contrast
+      resolvedCanvasColorsRef.current.strokeStyle = isDarkMode
+        ? { r: 255, g: 255, b: 255 } // White for dark mode
+        : { r: 0, g: 0, b: 0 } // Black for light mode
     }
 
     updateResolvedColors()
@@ -103,9 +78,6 @@ export const SignInPage: React.FC<SignInPageProps> = ({
 
     return () => {
       observer.disconnect()
-      if (tempElement.parentNode) {
-        tempElement.parentNode.removeChild(tempElement)
-      }
     }
   }, [])
 
