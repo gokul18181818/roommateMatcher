@@ -160,16 +160,26 @@ export default function EditProfilePage() {
     const finalJobTitle = data.job_title === 'Other' ? data.job_title_other : data.job_title
     const finalIndustry = data.industry === 'Other' ? data.industry_other : data.industry
 
+    // Process Instagram handle - remove @ symbols and trim, set to null if empty
+    const processedInstagramHandle = data.instagram_handle?.trim().replace(/^@+/g, '') || null
+    const finalInstagramHandle = processedInstagramHandle && processedInstagramHandle.length > 0 
+      ? processedInstagramHandle 
+      : null
+
     const submitData = {
       ...data,
       city: finalCity,
       job_title: finalJobTitle,
       industry: finalIndustry,
-      instagram_handle: data.instagram_handle?.trim().replace(/^@+/, '') || null,
+      instagram_handle: finalInstagramHandle,
     }
 
     updateProfile.mutate(submitData, {
       onSuccess: () => {
+        // Invalidate and refetch profile data to ensure fresh data
+        queryClient.invalidateQueries({ queryKey: ['profile', user?.id] })
+        queryClient.invalidateQueries({ queryKey: ['profile'] })
+        
         // Navigate back to profile page after successful save
         navigate('/my-profile', { replace: true })
       },
