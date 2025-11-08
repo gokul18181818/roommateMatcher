@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import emailjs from '@emailjs/browser'
 import { Button } from '@/components/ui/button'
-import { MessageSquare, Mail, Send } from 'lucide-react'
+import { MessageSquare, CheckCircle, AlertCircle } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 
 const feedbackSchema = z.object({
@@ -14,10 +15,16 @@ const feedbackSchema = z.object({
 
 type FeedbackFormData = z.infer<typeof feedbackSchema>
 
+// EmailJS configuration - these will need to be set in environment variables
+const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || ''
+const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || ''
+const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || ''
+
 export default function FeedbackPage() {
   const { user } = useAuthStore()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const {
     register,
@@ -36,20 +43,34 @@ export default function FeedbackPage() {
   const onSubmit = async (data: FeedbackFormData) => {
     setIsSubmitting(true)
     setShowSuccess(false)
+    setError(null)
 
     try {
-      // Create mailto link with pre-filled content
-      const recipient = 'gokulpremkumar03@gmail.com'
-      const subject = encodeURIComponent(data.subject)
-      const body = encodeURIComponent(
-        `Feedback from CareerCrib:\n\n${data.message}\n\n---\nUser Email: ${data.email || user?.email || 'Not provided'}\nUser ID: ${user?.id || 'Not provided'}`
+      // Check if EmailJS is configured
+      if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
+        throw new Error('Email service is not configured. Please contact support.')
+      }
+
+      // Prepare email template parameters
+      const templateParams = {
+        to_email: 'gokulpremkumar03@gmail.com',
+        from_name: data.email || user?.email || 'Anonymous User',
+        from_email: data.email || user?.email || 'noreply@careercrib.com',
+        subject: `CareerCrib Feedback: ${data.subject}`,
+        message: data.message,
+        user_id: user?.id || 'Not provided',
+        user_email: data.email || user?.email || 'Not provided',
+        reply_to: data.email || user?.email || 'noreply@careercrib.com',
+      }
+
+      // Send email using EmailJS
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        templateParams,
+        EMAILJS_PUBLIC_KEY
       )
-      
-      const mailtoLink = `mailto:${recipient}?subject=${subject}&body=${body}`
-      
-      // Open email client
-      window.location.href = mailtoLink
-      
+
       // Show success message
       setShowSuccess(true)
       reset()
@@ -58,9 +79,9 @@ export default function FeedbackPage() {
       setTimeout(() => {
         setShowSuccess(false)
       }, 5000)
-    } catch (error) {
-      console.error('Error submitting feedback:', error)
-      alert('Failed to open email client. Please send your feedback directly to gokulpremkumar03@gmail.com')
+    } catch (err: any) {
+      console.error('Error sending feedback:', err)
+      setError(err.text || err.message || 'Failed to send feedback. Please try again later.')
     } finally {
       setIsSubmitting(false)
     }
@@ -81,14 +102,24 @@ export default function FeedbackPage() {
       </div>
 
       {showSuccess && (
-        <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 rounded-lg flex items-center gap-2">
-          <Mail className="h-5 w-5 text-green-500" />
-          <p className="text-green-500 text-sm">
-            Your email client should open shortly. If it doesn't, please send your feedback directly to{' '}
-            <a href="mailto:gokulpremkumar03@gmail.com" className="underline font-medium">
-              gokulpremkumar03@gmail.com
-            </a>
-          </p>
+        <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 rounded-lg flex items-start gap-3">
+          <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-green-500 font-medium text-sm mb-1">Feedback sent successfully!</p>
+            <p className="text-green-500/80 text-sm">
+              Thank you for your feedback. We'll review it and get back to you if needed.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-red-500 font-medium text-sm mb-1">Error sending feedback</p>
+            <p className="text-red-500/80 text-sm">{error}</p>
+          </div>
         </div>
       )}
 
@@ -103,6 +134,7 @@ export default function FeedbackPage() {
             {...register('subject')}
             placeholder="What's your feedback about?"
             className="w-full px-4 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-foreground placeholder:text-muted-foreground"
+            disabled={isSubmitting}
           />
           {errors.subject && (
             <p className="mt-1 text-sm text-red-500">{errors.subject.message}</p>
@@ -119,6 +151,7 @@ export default function FeedbackPage() {
             rows={8}
             placeholder="Tell us what you think, what you'd like to see improved, or any issues you've encountered..."
             className="w-full px-4 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-foreground placeholder:text-muted-foreground resize-none"
+            disabled={isSubmitting}
           />
           {errors.message && (
             <p className="mt-1 text-sm text-red-500">{errors.message.message}</p>
@@ -135,6 +168,7 @@ export default function FeedbackPage() {
             {...register('email')}
             placeholder={user?.email || 'your.email@example.com'}
             className="w-full px-4 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-foreground placeholder:text-muted-foreground"
+            disabled={isSubmitting}
           />
           {errors.email && (
             <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
@@ -153,30 +187,20 @@ export default function FeedbackPage() {
             {isSubmitting ? (
               <>
                 <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                Opening email...
+                Sending...
               </>
             ) : (
               <>
-                <Send className="h-4 w-4" />
+                <MessageSquare className="h-4 w-4" />
                 Send Feedback
               </>
             )}
           </Button>
           <p className="text-sm text-muted-foreground">
-            Your email client will open with a pre-filled message
+            Your feedback will be sent directly to our team
           </p>
         </div>
       </form>
-
-      <div className="mt-8 p-4 bg-muted/50 rounded-lg border border-border">
-        <p className="text-sm text-muted-foreground">
-          <strong>Note:</strong> If your email client doesn't open automatically, please send your feedback directly to{' '}
-          <a href="mailto:gokulpremkumar03@gmail.com" className="text-primary hover:underline font-medium">
-            gokulpremkumar03@gmail.com
-          </a>
-        </p>
-      </div>
     </div>
   )
 }
-
