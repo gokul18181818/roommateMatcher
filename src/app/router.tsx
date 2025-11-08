@@ -10,6 +10,7 @@ import MessagesPage from '@/pages/messages/MessagesPage'
 import ChatPage from '@/pages/messages/ChatPage'
 import ProfilePage from '@/pages/profile/ProfilePage'
 import EditProfilePage from '@/pages/profile/EditProfilePage'
+import FeedbackPage from '@/pages/feedback/FeedbackPage'
 import { useAuth } from '@/hooks/useAuth'
 
 // MOCK MODE: Set to false to enable real authentication
@@ -91,6 +92,10 @@ export const router = createBrowserRouter([
       {
         path: 'my-profile/edit',
         element: <EditProfilePage />,
+      },
+      {
+        path: 'feedback',
+        element: <FeedbackPage />,
       },
     ],
   },
