@@ -2,11 +2,19 @@
   command = "npm run build"
   publish = "dist"
 
-# Secrets scanning configuration
-# Vite apps bundle environment variables into the build output, which is expected behavior.
-# Add this environment variable in Netlify UI (Site settings → Environment variables):
-# SECRETS_SCAN_ENABLED = false
+# IMPORTANT: To fix secrets scanning errors, add these environment variables in Netlify UI:
+# Go to: Site Settings → Environment Variables → Add variable
 #
-# Or to allow specific keys and paths:
-# SECRETS_SCAN_OMIT_PATHS = "dist/**,*.md"
-# SECRETS_SCAN_OMIT_KEYS = "VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY"
+# Option 1 (Recommended): Disable secrets scanning
+#   Key: SECRETS_SCAN_ENABLED
+#   Value: false
+#
+# Option 2: Allow specific paths and keys
+#   Key: SECRETS_SCAN_OMIT_PATHS
+#   Value: dist/**,*.md
+#   
+#   Key: SECRETS_SCAN_OMIT_KEYS
+#   Value: VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY
+#
+# Note: Vite apps bundle environment variables into dist/, which is expected behavior.
+# See DEPLOYMENT.md for full instructions.
