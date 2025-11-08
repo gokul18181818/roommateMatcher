@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/card'
 import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { MapPin } from 'lucide-react'
+import { MapPin, DollarSign } from 'lucide-react'
 import { truncateText } from '@/lib/utils'
 import CompanyLogo from '@/components/ui/CompanyLogo'
 import JobTitleIcon from '@/components/ui/JobTitleIcon'
@@ -60,6 +60,16 @@ export default function UserCard({ profile, currentUserId }: UserCardProps) {
               </div>
               <span className="text-muted-foreground leading-relaxed text-center font-medium">{profile.city}, {profile.state}</span>
             </div>
+            {(profile.budget_min || profile.budget_max) && (
+              <div className="flex items-center justify-center gap-2.5 text-sm">
+                <div className="p-1.5 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                  <DollarSign className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+                </div>
+                <span className="text-muted-foreground leading-relaxed text-center font-medium">
+                  ${profile.budget_min || '?'} - ${profile.budget_max || '?'} / month
+                </span>
+              </div>
+            )}
           </div>
 
           {profile.bio && (
@@ -90,8 +100,8 @@ export default function UserCard({ profile, currentUserId }: UserCardProps) {
             <span>View LinkedIn Profile</span>
           </a>
         )}
-        <Link 
-          to={`/messages?user=${profile.id}`} 
+        <Link
+          to={`/messages?user=${profile.id}`}
           className="block"
         >
           <Button className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl py-6 text-base">
@@ -102,4 +112,3 @@ export default function UserCard({ profile, currentUserId }: UserCardProps) {
     </Card>
   )
 }
-

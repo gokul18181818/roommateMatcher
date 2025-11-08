@@ -1,13 +1,12 @@
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useAuthStore } from '@/stores/authStore'
+import { useQuery } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { Profile } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, MapPin, Calendar, DollarSign, MessageSquare, Bookmark } from 'lucide-react'
+import { ArrowLeft, MapPin, Calendar, DollarSign, MessageSquare } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import CompanyLogo from '@/components/ui/CompanyLogo'
 import JobTitleIcon from '@/components/ui/JobTitleIcon'
@@ -15,8 +14,6 @@ import JobTitleIcon from '@/components/ui/JobTitleIcon'
 export default function ProfileDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { user } = useAuthStore()
-  const queryClient = useQueryClient()
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ['profile', id],
@@ -29,19 +26,6 @@ export default function ProfileDetailPage() {
 
       if (error) throw error
       return data as Profile
-    },
-  })
-
-  const bookmarkMutation = useMutation({
-    mutationFn: async () => {
-      if (!user || !id) throw new Error('Not authenticated')
-      const { error } = await supabase
-        .from('bookmarks')
-        .insert({ user_id: user.id, bookmarked_profile_id: id })
-      if (error) throw error
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
     },
   })
 
@@ -106,15 +90,7 @@ export default function ProfileDetailPage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <Button
-              onClick={() => bookmarkMutation.mutate()}
-              variant="outline"
-              className="px-6 py-2.5 rounded-lg font-medium"
-            >
-              <Bookmark className="h-4 w-4 mr-2" />
-              Bookmark
-            </Button>
+          <div className="flex items-center justify-center mb-8">
             <Link to={`/messages?user=${profile.id}`}>
               <Button className="px-6 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium shadow-sm hover:shadow-md transition-all">
                 <MessageSquare className="h-4 w-4 mr-2" />

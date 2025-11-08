@@ -1,8 +1,8 @@
 import { useRef, useState, useCallback } from 'react'
-import { Upload, X, Camera } from 'lucide-react'
+import { Upload, Camera } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 import { Avatar } from '@/components/ui/avatar'
+import { cn } from '@/lib/utils'
 
 interface ProfilePhotoUploadProps {
   currentPhotoUrl: string | null
@@ -18,9 +18,8 @@ export default function ProfilePhotoUpload({
   fallbackName = 'User',
 }: ProfilePhotoUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
-  const [isDragging, setIsDragging] = useState(false)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
   const displayUrl = previewUrl || currentPhotoUrl
 
@@ -45,14 +44,14 @@ export default function ProfilePhotoUpload({
       }
       reader.readAsDataURL(file)
 
+      // Upload the file
       setIsUploading(true)
-
       try {
         await onUpload(file)
-        setPreviewUrl(null) // Clear preview after successful upload
-        if (fileInputRef.current) {
-          fileInputRef.current.value = ''
-        }
+        // Clear preview after successful upload (component will re-render with new URL)
+        setTimeout(() => {
+          setPreviewUrl(null)
+        }, 500)
       } catch (error) {
         console.error('Upload error:', error)
         alert('Failed to upload photo. Please try again.')
@@ -64,81 +63,66 @@ export default function ProfilePhotoUpload({
     [onUpload]
   )
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (!disabled) {
-      setIsDragging(true)
-    }
-  }, [disabled])
-
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragging(false)
-  }, [])
-
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault()
-      e.stopPropagation()
-      setIsDragging(false)
-
-      if (disabled) return
-
-      const files = e.dataTransfer.files
-      if (files.length > 0) {
-        handleFileSelect(files[0])
-      }
-    },
-    [disabled, handleFileSelect]
-  )
-
   const handleFileInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.files && e.target.files.length > 0) {
-        handleFileSelect(e.target.files[0])
+      const file = e.target.files?.[0]
+      if (file) {
+        handleFileSelect(file)
+      }
+      // Reset input value so same file can be selected again
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
       }
     },
     [handleFileSelect]
   )
 
+  const handleButtonClick = useCallback(() => {
+    if (disabled || isUploading) return
+    fileInputRef.current?.click()
+  }, [disabled, isUploading])
+
+  const handleAvatarClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (disabled || isUploading) return
+      e.preventDefault()
+      e.stopPropagation()
+      fileInputRef.current?.click()
+    },
+    [disabled, isUploading]
+  )
+
   return (
     <div className="flex flex-col items-center gap-4">
-      <div
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        className={cn(
-          'relative group',
-          isDragging && 'scale-105'
-        )}
-      >
-        <Avatar
-          src={displayUrl || undefined}
-          fallback={fallbackName}
+      <div className="relative">
+        <div
+          onClick={handleAvatarClick}
           className={cn(
-            'h-32 w-32 border-4 border-white shadow-xl transition-all',
-            isDragging && 'border-indigo-400 ring-4 ring-indigo-200',
-            disabled && 'opacity-50'
+            'relative cursor-pointer transition-all',
+            (disabled || isUploading) && 'cursor-not-allowed opacity-50',
+            !disabled && !isUploading && 'hover:opacity-90'
           )}
-        />
+        >
+          <Avatar
+            src={displayUrl || undefined}
+            fallback={fallbackName}
+            className="h-32 w-32 border-4 border-white shadow-xl"
+          />
+          
+          {/* Upload overlay on hover */}
+          {!disabled && !isUploading && (
+            <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+              <Camera className="h-8 w-8 text-white" />
+            </div>
+          )}
 
-        {/* Upload overlay on hover */}
-        {!disabled && (
-          <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Camera className="h-8 w-8 text-white" />
-          </div>
-        )}
-
-        {/* Upload indicator */}
-        {isUploading && (
-          <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center">
-            <Upload className="h-8 w-8 text-white animate-pulse" />
-          </div>
-        )}
+          {/* Upload indicator */}
+          {isUploading && (
+            <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center">
+              <Upload className="h-8 w-8 text-white animate-pulse" />
+            </div>
+          )}
+        </div>
       </div>
 
       <input
@@ -148,6 +132,7 @@ export default function ProfilePhotoUpload({
         onChange={handleFileInputChange}
         disabled={disabled || isUploading}
         className="hidden"
+        id="profile-photo-input"
       />
 
       <div className="text-center space-y-2">
@@ -155,7 +140,7 @@ export default function ProfilePhotoUpload({
           type="button"
           variant="outline"
           size="sm"
-          onClick={() => fileInputRef.current?.click()}
+          onClick={handleButtonClick}
           disabled={disabled || isUploading}
           className="text-sm"
         >
@@ -183,4 +168,3 @@ export default function ProfilePhotoUpload({
     </div>
   )
 }
-

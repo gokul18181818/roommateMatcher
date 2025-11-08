@@ -17,11 +17,11 @@ export function HandWrittenTitle({
       pathLength: 1,
       opacity: 1,
       transition: {
-        pathLength: { duration: 2.5, ease: [0.43, 0.13, 0.23, 0.96] },
+        pathLength: { duration: 2.5, ease: [0.43, 0.13, 0.23, 0.96] as [number, number, number, number] },
         opacity: { duration: 0.5 },
       },
     },
-  }
+  } as const
 
   return (
     <div className="relative w-full max-w-4xl mx-auto py-12 md:py-16">

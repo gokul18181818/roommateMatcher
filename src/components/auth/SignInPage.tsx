@@ -1,11 +1,10 @@
 import React, { useEffect, useRef, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { cn } from '@/lib/utils'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 
 // --- HELPER COMPONENTS (ICONS) ---
 const LinkedInIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="#0077B5">
     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
   </svg>
 )
@@ -29,28 +28,16 @@ interface SignInPageProps {
   onCreateAccount?: () => void
 }
 
-// --- SUB-COMPONENTS ---
-const TestimonialCard = ({ testimonial, delay }: { testimonial: Testimonial; delay: string }) => (
-  <div className={cn(`animate-testimonial ${delay} flex items-start gap-3 rounded-3xl bg-card/60 dark:bg-card/80 backdrop-blur-xl border border-border/50 p-5 w-64 shadow-lg`)}>
-    <img src={testimonial.avatarSrc} className="h-10 w-10 object-cover rounded-2xl" alt="avatar" />
-    <div className="text-sm leading-snug">
-      <p className="flex items-center gap-1 font-medium text-card-foreground">{testimonial.name}</p>
-      <p className="text-muted-foreground">{testimonial.handle}</p>
-      <p className="mt-1 text-card-foreground/80">{testimonial.text}</p>
-    </div>
-  </div>
-)
-
 // --- MAIN COMPONENT ---
 export const SignInPage: React.FC<SignInPageProps> = ({
-  title = <span className="font-light text-foreground tracking-tighter">Welcome</span>,
-  description = "Access your account and continue your journey with us",
-  heroImageSrc,
-  testimonials = [],
-  onSignIn,
+  title: _title = <span className="font-light text-foreground tracking-tighter">Welcome</span>,
+  description: _description = "Access your account and continue your journey with us",
+  heroImageSrc: _heroImageSrc,
+  testimonials: _testimonials = [],
+  onSignIn: _onSignIn,
   onLinkedInSignIn,
-  onResetPassword,
-  onCreateAccount,
+  onResetPassword: _onResetPassword,
+  onCreateAccount: _onCreateAccount,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const linkedInButtonRef = useRef<HTMLButtonElement>(null)
@@ -225,7 +212,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
   }, [drawArrow])
 
   return (
-    <div className="bg-background text-foreground min-h-screen flex flex-col relative">
+    <div className="bg-white dark:bg-background text-gray-900 dark:text-foreground min-h-screen flex flex-col relative">
       {/* Theme Toggle */}
       <div className="absolute top-4 right-4 z-50">
         <ThemeToggle />
@@ -233,7 +220,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
 
 
       {/* Main Hero Content */}
-      <main className="flex-grow flex flex-col items-center justify-center px-4">
+      <main className="flex-grow flex flex-col items-center justify-center px-4 py-12">
         {/* Logo */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
@@ -241,7 +228,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
           transition={{ duration: 0.5 }}
           className="mb-8"
         >
-          <img src="/logo.svg" alt="CareerCrib" className="h-24 w-24 md:h-32 md:w-32 mx-auto" />
+          <img src="/logo.svg" alt="CareerCrib" className="h-40 w-40 md:h-48 md:w-48 mx-auto" />
         </motion.div>
 
         {/* Heading */}
@@ -250,15 +237,16 @@ export const SignInPage: React.FC<SignInPageProps> = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.8 }}
-            className="text-4xl sm:text-5xl lg:text-6xl font-bold text-center px-4 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent"
+            className="text-4xl sm:text-5xl lg:text-6xl font-bold text-center px-4"
           >
-            Find Your Perfect Roommate Match
+            <span className="text-[#1e3a8a] dark:text-[#3b82f6]">Find Your</span>{' '}
+            <span className="text-[#9333ea] dark:text-[#a855f7]">Perfect Roommate Match</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.8 }}
-            className="mt-4 block text-muted-foreground text-center text-base sm:text-lg px-4 max-w-2xl"
+            className="mt-4 block text-gray-700 dark:text-muted-foreground text-center text-base sm:text-lg px-4 max-w-2xl"
           >
             Connect with professionals in your field. CareerCrib matches you with roommates based on shared career fields, companies, and professional interests.
           </motion.p>
@@ -272,9 +260,9 @@ export const SignInPage: React.FC<SignInPageProps> = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.8 }}
-            className="flex items-center justify-center gap-3 py-3 px-8 rounded-xl border-2 border-primary/50 hover:border-primary bg-primary/10 hover:bg-primary/20 text-foreground transition-all focus:outline-none focus:ring-2 focus:ring-ring shadow-lg hover:shadow-xl group"
+            className="flex items-center justify-center gap-3 py-3 px-8 rounded-xl border border-[#60A5FA] bg-[#E0F2FE] hover:bg-[#BAE6FD] text-[#0369A1] transition-all focus:outline-none focus:ring-2 focus:ring-[#60A5FA] shadow-md hover:shadow-lg group"
           >
-            <div className="text-[#0077b5] dark:text-[#0A66C2] group-hover:scale-110 transition-transform">
+            <div className="group-hover:scale-110 transition-transform">
               <LinkedInIcon />
             </div>
             <span className="font-semibold text-base">Continue with LinkedIn</span>
@@ -288,38 +276,25 @@ export const SignInPage: React.FC<SignInPageProps> = ({
           transition={{ delay: 0.8, duration: 0.8 }}
           className="mt-12 lg:mt-16 w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 px-4"
         >
-          <div className="p-6 rounded-2xl bg-card/50 dark:bg-card/70 backdrop-blur-sm border border-border/50 text-center">
-            <h3 className="font-semibold text-card-foreground mb-2">Career Matching</h3>
-            <p className="text-sm text-muted-foreground">
+          <div className="p-6 rounded-xl bg-white dark:bg-card border border-gray-200 dark:border-border shadow-sm text-center">
+            <h3 className="font-semibold text-gray-900 dark:text-card-foreground mb-2">Career Matching</h3>
+            <p className="text-sm text-gray-600 dark:text-muted-foreground">
               Connect with professionals in similar fields
             </p>
           </div>
-          <div className="p-6 rounded-2xl bg-card/50 dark:bg-card/70 backdrop-blur-sm border border-border/50 text-center">
-            <h3 className="font-semibold text-card-foreground mb-2">Verified Profiles</h3>
-            <p className="text-sm text-muted-foreground">
+          <div className="p-6 rounded-xl bg-white dark:bg-card border border-gray-200 dark:border-border shadow-sm text-center">
+            <h3 className="font-semibold text-gray-900 dark:text-card-foreground mb-2">Verified Profiles</h3>
+            <p className="text-sm text-gray-600 dark:text-muted-foreground">
               LinkedIn authentication ensures real professionals
             </p>
           </div>
-          <div className="p-6 rounded-2xl bg-card/50 dark:bg-card/70 backdrop-blur-sm border border-border/50 text-center">
-            <h3 className="font-semibold text-card-foreground mb-2">Safe & Secure</h3>
-            <p className="text-sm text-muted-foreground">
+          <div className="p-6 rounded-xl bg-white dark:bg-card border border-gray-200 dark:border-border shadow-sm text-center">
+            <h3 className="font-semibold text-gray-900 dark:text-card-foreground mb-2">Safe & Secure</h3>
+            <p className="text-sm text-gray-600 dark:text-muted-foreground">
               Privacy and safety as top priorities
             </p>
           </div>
         </motion.div>
-
-        {/* Terms */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1, duration: 0.8 }}
-          className="mt-8 text-xs text-center text-muted-foreground leading-relaxed px-4"
-        >
-          By continuing, you agree to our{' '}
-          <a href="#" className="text-primary hover:underline transition-colors">Terms of Service</a>
-          {' '}and{' '}
-          <a href="#" className="text-primary hover:underline transition-colors">Privacy Policy</a>
-        </motion.p>
       </main>
 
       <div className="h-12 sm:h-16 md:h-24"></div>

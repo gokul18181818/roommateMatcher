@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useAuthStore } from '@/stores/authStore'
 import { supabase } from '@/lib/supabase'
+import { fetchLinkedInProfileUrl } from '@/lib/linkedin'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -15,19 +16,97 @@ const profileSchema = z.object({
   full_name: z.string().min(2, 'Name must be at least 2 characters'),
   date_of_birth: z.string().min(1, 'Date of birth is required'),
   city: z.string().min(1, 'City is required'),
+  city_other: z.string().optional(),
   state: z.string().min(1, 'State is required'),
   job_title: z.string().min(1, 'Job title is required'),
+  job_title_other: z.string().optional(),
   company: z.string().min(1, 'Company is required'),
+  linkedin_profile_url: z.string().url('Please enter a valid LinkedIn URL').min(1, 'LinkedIn profile URL is required'),
   bio: z.string().min(150, 'Bio must be at least 150 characters').max(500, 'Bio must be less than 500 characters'),
   budget_min: z.number().optional(),
   budget_max: z.number().optional(),
   move_in_date: z.string().optional(),
   move_in_flexible: z.boolean().default(false),
-  industry: z.string().optional(),
+  industry: z.string().min(1, 'Industry is required'),
+  industry_other: z.string().optional(),
   work_schedule: z.enum(['remote', 'hybrid', 'in-office']).optional(),
-})
+}).refine(
+  (data) => {
+    if (data.city === 'Other' && (!data.city_other || data.city_other.trim() === '')) {
+      return false
+    }
+    return true
+  },
+  { message: 'Please specify your city', path: ['city_other'] }
+).refine(
+  (data) => {
+    if (data.job_title === 'Other' && (!data.job_title_other || data.job_title_other.trim() === '')) {
+      return false
+    }
+    return true
+  },
+  { message: 'Please specify your job title', path: ['job_title_other'] }
+).refine(
+  (data) => {
+    if (data.industry === 'Other' && (!data.industry_other || data.industry_other.trim() === '')) {
+      return false
+    }
+    return true
+  },
+  { message: 'Please specify your industry', path: ['industry_other'] }
+)
 
 type ProfileFormData = z.infer<typeof profileSchema>
+
+const COMMON_INDUSTRIES = [
+  'Technology',
+  'Finance',
+  'Healthcare',
+  'Consulting',
+  'Marketing',
+  'Education',
+  'Engineering',
+  'Sales',
+  'Design',
+  'Legal',
+  'Other'
+]
+
+const COMMON_JOB_TITLES = [
+  'Software Engineer',
+  'Product Manager',
+  'Data Scientist',
+  'Financial Analyst',
+  'Consultant',
+  'Marketing Manager',
+  'Sales Representative',
+  'UX/UI Designer',
+  'Project Manager',
+  'Business Analyst',
+  'Other'
+]
+
+const COMMON_CITIES = [
+  'San Francisco',
+  'New York',
+  'Los Angeles',
+  'Seattle',
+  'Austin',
+  'Boston',
+  'Chicago',
+  'Denver',
+  'Washington DC',
+  'Atlanta',
+  'Other'
+]
+
+const US_STATES = [
+  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
+  'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
+  'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+  'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
+  'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'
+]
 
 export default function OnboardingPage() {
   const navigate = useNavigate()
@@ -40,6 +119,9 @@ export default function OnboardingPage() {
   })
 
   const bioLength = watch('bio')?.length || 0
+  const selectedCity = watch('city')
+  const selectedJobTitle = watch('job_title')
+  const selectedIndustry = watch('industry')
 
   // Auto-populate from LinkedIn user metadata
   useEffect(() => {
@@ -95,7 +177,7 @@ export default function OnboardingPage() {
                        ''
       if (location) {
         // Try to parse city and state from location string
-        const parts = location.split(',').map(p => p.trim())
+        const parts = location.split(',').map((p: string) => p.trim())
         if (parts.length >= 2) {
           setValue('city', parts[0])
           setValue('state', parts[1])
@@ -111,16 +193,28 @@ export default function OnboardingPage() {
       if (industry) {
         setValue('industry', industry)
       }
+      
+      // Auto-fill LinkedIn profile URL if available
+      const linkedinUrl = linkedinData.profile_url || 
+                          linkedinData.linkedin_url || 
+                          linkedinData.url ||
+                          metadata.profile_url || 
+                          metadata.linkedin_url ||
+                          metadata.url ||
+                          ''
+      if (linkedinUrl) {
+        setValue('linkedin_profile_url', linkedinUrl)
+      }
     }
     
     loadLinkedInData()
   }, [user, setValue])
   
-  // Check if step 2 is valid
-  const isStep2Valid = () => {
-    const bio = watch('bio')
-    return bio && bio.length >= 150 && bio.length <= 500
-  }
+  // Check if step 2 is valid (currently not used but kept for future use)
+  // const isStep2Valid = () => {
+  //   const bio = watch('bio')
+  //   return bio && bio.length >= 150 && bio.length <= 500
+  // }
 
   const createProfile = useMutation({
     mutationFn: async (data: ProfileFormData) => {
@@ -153,16 +247,42 @@ export default function OnboardingPage() {
                               currentUser.user_metadata?.avatar_url ||
                               null
 
-      // Get LinkedIn profile URL - LinkedIn OAuth provides 'sub' which is the LinkedIn ID
-      // Format: https://www.linkedin.com/in/{linkedin-id}/
+      // Get LinkedIn profile URL
+      // LinkedIn OAuth with OIDC provides 'sub' which is a numeric ID, not a username
+      // We need to fetch the vanityName from LinkedIn API using the access token
       const linkedinId = linkedinData.sub || 
                         linkedinData.id || 
                         metadata.sub || 
                         metadata.linkedin_id ||
-                        null
-      const linkedinProfileUrl = linkedinId 
-        ? `https://www.linkedin.com/in/${linkedinId}/`
-        : (linkedinData.profile_url || linkedinData.linkedin_url || metadata.profile_url || null)
+                        currentUser.id // Fallback to user ID if no LinkedIn ID
+      
+      // Use the LinkedIn URL from the form if provided, otherwise try to get it from various sources
+      let linkedinProfileUrl = data.linkedin_profile_url?.trim() || null
+      
+      if (!linkedinProfileUrl) {
+        // Try to get the actual LinkedIn profile URL from various sources first
+        linkedinProfileUrl = linkedinData.profile_url || 
+                            linkedinData.linkedin_url || 
+                            linkedinData.url ||
+                            metadata.profile_url || 
+                            metadata.linkedin_url ||
+                            metadata.url ||
+                            null
+        
+        // If we don't have a URL, try to fetch it from LinkedIn API using the access token
+        if (!linkedinProfileUrl) {
+          console.log('Attempting to fetch LinkedIn profile URL from API...')
+          const fetchedUrl = await fetchLinkedInProfileUrl()
+          if (fetchedUrl) {
+            linkedinProfileUrl = fetchedUrl
+          }
+        }
+      }
+
+      // Use "Other" field values if "Other" was selected
+      const finalCity = data.city === 'Other' ? data.city_other : data.city
+      const finalJobTitle = data.job_title === 'Other' ? data.job_title_other : data.job_title
+      const finalIndustry = data.industry === 'Other' ? data.industry_other : data.industry
 
       const profileData = {
         id: currentUser.id,
@@ -172,16 +292,16 @@ export default function OnboardingPage() {
         date_of_birth: data.date_of_birth,
         age: calculatedAge,
         profile_photo_url: profilePhotoUrl,
-        city: data.city,
+        city: finalCity,
         state: data.state,
-        job_title: data.job_title,
+        job_title: finalJobTitle,
         company: data.company,
         bio: data.bio,
         budget_min: data.budget_min || null,
         budget_max: data.budget_max || null,
         move_in_date: data.move_in_date || null,
         move_in_flexible: data.move_in_flexible,
-        industry: data.industry || null,
+        industry: finalIndustry || null,
         work_schedule: data.work_schedule || null,
         profile_completed: true,
       }
@@ -254,42 +374,95 @@ export default function OnboardingPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium mb-2 block">City</label>
-                    <Input {...register('city')} placeholder="San Francisco" />
+                    <select {...register('city')} className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm">
+                      <option value="">Select city...</option>
+                      {COMMON_CITIES.map(city => (
+                        <option key={city} value={city}>{city}</option>
+                      ))}
+                    </select>
                     {errors.city && <p className="text-sm text-destructive mt-1">{errors.city.message}</p>}
+                    {selectedCity === 'Other' && (
+                      <div className="mt-2">
+                        <Input {...register('city_other')} placeholder="Enter your city" />
+                        {errors.city_other && <p className="text-sm text-destructive mt-1">{errors.city_other.message}</p>}
+                      </div>
+                    )}
                   </div>
                   <div>
                     <label className="text-sm font-medium mb-2 block">State</label>
-                    <Input {...register('state')} placeholder="CA" />
+                    <select {...register('state')} className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm">
+                      <option value="">Select state...</option>
+                      {US_STATES.map(state => (
+                        <option key={state} value={state}>{state}</option>
+                      ))}
+                    </select>
                     {errors.state && <p className="text-sm text-destructive mt-1">{errors.state.message}</p>}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Job Title</label>
-                    <Input {...register('job_title')} placeholder="Software Engineer" />
-                    {errors.job_title && <p className="text-sm text-destructive mt-1">{errors.job_title.message}</p>}
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Company</label>
-                    <Input {...register('company')} placeholder="Google" />
-                    {errors.company && <p className="text-sm text-destructive mt-1">{errors.company.message}</p>}
-                  </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Job Title</label>
+                  <select {...register('job_title')} className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm">
+                    <option value="">Select job title...</option>
+                    {COMMON_JOB_TITLES.map(title => (
+                      <option key={title} value={title}>{title}</option>
+                    ))}
+                  </select>
+                  {errors.job_title && <p className="text-sm text-destructive mt-1">{errors.job_title.message}</p>}
+                  {selectedJobTitle === 'Other' && (
+                    <div className="mt-2">
+                      <Input {...register('job_title_other')} placeholder="Enter your job title" />
+                      {errors.job_title_other && <p className="text-sm text-destructive mt-1">{errors.job_title_other.message}</p>}
+                    </div>
+                  )}
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Industry (Optional)</label>
-                  <Input {...register('industry')} placeholder="Technology" />
+                  <label className="text-sm font-medium mb-2 block">Company</label>
+                  <Input {...register('company')} placeholder="Google" />
+                  {errors.company && <p className="text-sm text-destructive mt-1">{errors.company.message}</p>}
                 </div>
 
-                <Button 
-                  type="button" 
+                <div>
+                  <label className="text-sm font-medium mb-2 block">
+                    LinkedIn Profile URL <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    {...register('linkedin_profile_url')}
+                    type="url"
+                    placeholder="https://www.linkedin.com/in/yourprofile"
+                  />
+                  {errors.linkedin_profile_url && <p className="text-sm text-destructive mt-1">{errors.linkedin_profile_url.message}</p>}
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Required - Your LinkedIn profile URL
+                  </p>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Industry</label>
+                  <select {...register('industry')} className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm">
+                    <option value="">Select industry...</option>
+                    {COMMON_INDUSTRIES.map(industry => (
+                      <option key={industry} value={industry}>{industry}</option>
+                    ))}
+                  </select>
+                  {errors.industry && <p className="text-sm text-destructive mt-1">{errors.industry.message}</p>}
+                  {selectedIndustry === 'Other' && (
+                    <div className="mt-2">
+                      <Input {...register('industry_other')} placeholder="Enter your industry" />
+                      {errors.industry_other && <p className="text-sm text-destructive mt-1">{errors.industry_other.message}</p>}
+                    </div>
+                  )}
+                </div>
+
+                <Button
+                  type="button"
                   onClick={async () => {
-                    const isValid = await trigger(['full_name', 'date_of_birth', 'city', 'state', 'job_title', 'company'])
+                    const isValid = await trigger(['full_name', 'date_of_birth', 'city', 'city_other', 'state', 'job_title', 'job_title_other', 'company', 'linkedin_profile_url', 'industry', 'industry_other'])
                     if (isValid) {
                       setStep(2)
                     }
-                  }} 
+                  }}
                   className="w-full"
                 >
                   Continue

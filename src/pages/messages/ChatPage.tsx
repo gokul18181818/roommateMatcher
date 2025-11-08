@@ -7,7 +7,6 @@ import { Message, Conversation, Profile } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Avatar } from '@/components/ui/avatar'
 import { ArrowLeft, Send } from 'lucide-react'
-import { formatRelativeTime } from '@/lib/utils'
 
 export default function ChatPage() {
   const { conversationId } = useParams<{ conversationId: string }>()
@@ -33,7 +32,7 @@ export default function ChatPage() {
   })
 
   const { data: otherUser } = useQuery({
-    queryKey: ['profile', conversation?.participant_1_id === user?.id ? conversation.participant_2_id : conversation?.participant_1_id],
+    queryKey: ['profile', conversation ? (conversation.participant_1_id === user?.id ? conversation.participant_2_id : conversation.participant_1_id) : null],
     queryFn: async () => {
       if (!conversation || !user) return null
       const otherUserId = conversation.participant_1_id === user.id ? conversation.participant_2_id : conversation.participant_1_id
@@ -164,7 +163,7 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="h-screen bg-background flex flex-col">
+    <div className="h-[calc(100vh-4rem-5.5rem)] bg-background flex flex-col -mx-4 -mt-6 -mb-24">
       {/* iOS-style Header */}
       <div className="bg-background border-b border-border/40 sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">

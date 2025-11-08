@@ -6,7 +6,7 @@ export default function MainLayout() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto px-4 pb-20 pt-6">
+      <main className="container mx-auto px-4 pb-24 pt-6">
         <Outlet />
       </main>
       <TabNavigation />

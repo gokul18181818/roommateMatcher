@@ -15,8 +15,39 @@ export default function ExplorePage() {
   const [showFilters, setShowFilters] = useState(false)
   const [filters, setFilters] = useState({
     city: '',
-    industry: '',
+    state: '',
+    job_title: '',
     company: '',
+    industry: '',
+    work_schedule: '',
+    budget_min: '',
+    budget_max: '',
+  })
+
+  // Get unique filter values from existing profiles
+  const { data: filterOptions } = useQuery({
+    queryKey: ['filter-options'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('city, state, job_title, company, industry, work_schedule')
+        .eq('is_active', true)
+
+      if (error) throw error
+
+      const profiles = data as Profile[]
+
+      // Extract unique values
+      const cities = [...new Set(profiles.map(p => p.city).filter(Boolean))].sort()
+      const states = [...new Set(profiles.map(p => p.state).filter(Boolean))].sort()
+      const jobTitles = [...new Set(profiles.map(p => p.job_title).filter(Boolean))].sort()
+      const companies = [...new Set(profiles.map(p => p.company).filter(Boolean))].sort()
+      const industries = [...new Set(profiles.map(p => p.industry).filter(Boolean))].sort()
+      const workSchedules = [...new Set(profiles.map(p => p.work_schedule).filter(Boolean))].sort()
+
+      return { cities, states, jobTitles, companies, industries, workSchedules }
+    },
+    enabled: !!user,
   })
 
   const { data: profiles, isLoading } = useQuery({
@@ -33,15 +64,35 @@ export default function ExplorePage() {
       }
 
       if (filters.city) {
-        query = query.ilike('city', `%${filters.city}%`)
+        query = query.eq('city', filters.city)
+      }
+
+      if (filters.state) {
+        query = query.eq('state', filters.state)
+      }
+
+      if (filters.job_title) {
+        query = query.eq('job_title', filters.job_title)
+      }
+
+      if (filters.company) {
+        query = query.eq('company', filters.company)
       }
 
       if (filters.industry) {
         query = query.eq('industry', filters.industry)
       }
 
-      if (filters.company) {
-        query = query.ilike('company', `%${filters.company}%`)
+      if (filters.work_schedule) {
+        query = query.eq('work_schedule', filters.work_schedule)
+      }
+
+      if (filters.budget_min) {
+        query = query.gte('budget_max', parseInt(filters.budget_min))
+      }
+
+      if (filters.budget_max) {
+        query = query.lte('budget_min', parseInt(filters.budget_max))
       }
 
       const { data, error } = await query.limit(50)
@@ -112,38 +163,124 @@ export default function ExplorePage() {
 
         {showFilters && (
           <div className="p-8 bg-card rounded-2xl border shadow-xl space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* City Filter */}
               <div className="space-y-3">
                 <label className="text-sm font-bold text-card-foreground uppercase tracking-wide">City</label>
-                <Input
-                  placeholder="San Francisco"
+                <select
                   value={filters.city}
                   onChange={(e) => setFilters({ ...filters, city: e.target.value })}
-                  className="border-0 bg-muted rounded-xl h-12 focus:bg-card focus:ring-2 focus:ring-indigo-500/20 shadow-sm"
-                />
+                  className="flex h-12 w-full rounded-xl border-0 bg-muted px-3 py-2 text-sm focus:bg-card focus:ring-2 focus:ring-indigo-500/20 shadow-sm"
+                >
+                  <option value="">All Cities</option>
+                  {filterOptions?.cities.map(city => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+                </select>
               </div>
+
+              {/* State Filter */}
               <div className="space-y-3">
-                <label className="text-sm font-bold text-card-foreground uppercase tracking-wide">Industry</label>
-                <Input
-                  placeholder="Technology"
-                  value={filters.industry}
-                  onChange={(e) => setFilters({ ...filters, industry: e.target.value })}
-                  className="border-0 bg-muted rounded-xl h-12 focus:bg-card focus:ring-2 focus:ring-indigo-500/20 shadow-sm"
-                />
+                <label className="text-sm font-bold text-card-foreground uppercase tracking-wide">State</label>
+                <select
+                  value={filters.state}
+                  onChange={(e) => setFilters({ ...filters, state: e.target.value })}
+                  className="flex h-12 w-full rounded-xl border-0 bg-muted px-3 py-2 text-sm focus:bg-card focus:ring-2 focus:ring-indigo-500/20 shadow-sm"
+                >
+                  <option value="">All States</option>
+                  {filterOptions?.states.map(state => (
+                    <option key={state} value={state}>{state}</option>
+                  ))}
+                </select>
               </div>
+
+              {/* Job Title Filter */}
+              <div className="space-y-3">
+                <label className="text-sm font-bold text-card-foreground uppercase tracking-wide">Job Title</label>
+                <select
+                  value={filters.job_title}
+                  onChange={(e) => setFilters({ ...filters, job_title: e.target.value })}
+                  className="flex h-12 w-full rounded-xl border-0 bg-muted px-3 py-2 text-sm focus:bg-card focus:ring-2 focus:ring-indigo-500/20 shadow-sm"
+                >
+                  <option value="">All Job Titles</option>
+                  {filterOptions?.jobTitles.map(title => (
+                    <option key={title} value={title}>{title}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Company Filter */}
               <div className="space-y-3">
                 <label className="text-sm font-bold text-card-foreground uppercase tracking-wide">Company</label>
-                <Input
-                  placeholder="Google"
+                <select
                   value={filters.company}
                   onChange={(e) => setFilters({ ...filters, company: e.target.value })}
+                  className="flex h-12 w-full rounded-xl border-0 bg-muted px-3 py-2 text-sm focus:bg-card focus:ring-2 focus:ring-indigo-500/20 shadow-sm"
+                >
+                  <option value="">All Companies</option>
+                  {filterOptions?.companies.map(company => (
+                    <option key={company} value={company}>{company}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Industry Filter */}
+              <div className="space-y-3">
+                <label className="text-sm font-bold text-card-foreground uppercase tracking-wide">Industry</label>
+                <select
+                  value={filters.industry}
+                  onChange={(e) => setFilters({ ...filters, industry: e.target.value })}
+                  className="flex h-12 w-full rounded-xl border-0 bg-muted px-3 py-2 text-sm focus:bg-card focus:ring-2 focus:ring-indigo-500/20 shadow-sm"
+                >
+                  <option value="">All Industries</option>
+                  {filterOptions?.industries.map(industry => (
+                    <option key={industry} value={industry || ''}>{industry}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Work Schedule Filter */}
+              <div className="space-y-3">
+                <label className="text-sm font-bold text-card-foreground uppercase tracking-wide">Work Schedule</label>
+                <select
+                  value={filters.work_schedule}
+                  onChange={(e) => setFilters({ ...filters, work_schedule: e.target.value })}
+                  className="flex h-12 w-full rounded-xl border-0 bg-muted px-3 py-2 text-sm focus:bg-card focus:ring-2 focus:ring-indigo-500/20 shadow-sm"
+                >
+                  <option value="">All Schedules</option>
+                  {filterOptions?.workSchedules.map(schedule => (
+                    <option key={schedule} value={schedule || ''} className="capitalize">{schedule}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Budget Min Filter */}
+              <div className="space-y-3">
+                <label className="text-sm font-bold text-card-foreground uppercase tracking-wide">Min Budget</label>
+                <Input
+                  type="number"
+                  placeholder="Min ($)"
+                  value={filters.budget_min}
+                  onChange={(e) => setFilters({ ...filters, budget_min: e.target.value })}
+                  className="border-0 bg-muted rounded-xl h-12 focus:bg-card focus:ring-2 focus:ring-indigo-500/20 shadow-sm"
+                />
+              </div>
+
+              {/* Budget Max Filter */}
+              <div className="space-y-3">
+                <label className="text-sm font-bold text-card-foreground uppercase tracking-wide">Max Budget</label>
+                <Input
+                  type="number"
+                  placeholder="Max ($)"
+                  value={filters.budget_max}
+                  onChange={(e) => setFilters({ ...filters, budget_max: e.target.value })}
                   className="border-0 bg-muted rounded-xl h-12 focus:bg-card focus:ring-2 focus:ring-indigo-500/20 shadow-sm"
                 />
               </div>
             </div>
             <Button
               variant="outline"
-              onClick={() => setFilters({ city: '', industry: '', company: '' })}
+              onClick={() => setFilters({ city: '', state: '', job_title: '', company: '', industry: '', work_schedule: '', budget_min: '', budget_max: '' })}
               className="border-0 bg-muted hover:bg-muted/80 rounded-xl font-semibold px-6"
             >
               Clear Filters

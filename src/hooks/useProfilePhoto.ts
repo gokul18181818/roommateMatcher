@@ -13,7 +13,6 @@ export function useProfilePhoto() {
       // Upload to Supabase Storage
       const fileExt = file.name.split('.').pop()
       const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
-      const filePath = `profile-photos/${fileName}`
 
       const { error: uploadError } = await supabase.storage
         .from('profile-photos')
@@ -22,7 +21,10 @@ export function useProfilePhoto() {
           upsert: false,
         })
 
-      if (uploadError) throw uploadError
+      if (uploadError) {
+        console.error('Upload error:', uploadError)
+        throw uploadError
+      }
 
       // Get public URL
       const { data: urlData } = supabase.storage

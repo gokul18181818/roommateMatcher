@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
 import { supabase } from '@/lib/supabase'
 import { SignInPage } from '@/components/auth/SignInPage'
-import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { useAuth } from '@/hooks/useAuth'
 
 export default function LoginPage() {
@@ -18,10 +17,12 @@ export default function LoginPage() {
   }, [user, loading, navigate])
 
   const handleLinkedInLogin = async () => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: 'linkedin_oidc',
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
+        scopes: 'openid profile email', // Request necessary scopes
+        skipBrowserRedirect: false,
       },
     })
 
@@ -33,9 +34,6 @@ export default function LoginPage() {
 
   return (
     <div className="relative">
-      <div className="absolute top-4 right-4 z-50">
-        <ThemeToggle />
-      </div>
       <SignInPage
         onLinkedInSignIn={handleLinkedInLogin}
         onSignIn={(e) => {

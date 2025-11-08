@@ -120,7 +120,7 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="h-screen bg-background flex flex-col">
+    <div className="h-[calc(100vh-4rem-5.5rem)] bg-background flex flex-col -mx-4 -mt-6 -mb-24">
       {/* iOS-style Header */}
       <div className="bg-background border-b border-border/40 sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-3">

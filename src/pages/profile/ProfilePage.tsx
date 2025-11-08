@@ -1,25 +1,23 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { useAuthStore } from '@/stores/authStore'
 import { useProfile } from '@/hooks/useProfile'
-import { useProfilePhoto } from '@/hooks/useProfilePhoto'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Avatar } from '@/components/ui/avatar'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Edit, MapPin, Calendar, DollarSign, Trash2 } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import CompanyLogo from '@/components/ui/CompanyLogo'
 import JobTitleIcon from '@/components/ui/JobTitleIcon'
-import ProfilePhotoUpload from '@/components/profile/ProfilePhotoUpload'
 
 export default function ProfilePage() {
   const navigate = useNavigate()
   const { user, signOut } = useAuthStore()
   const { data: profile, isLoading } = useProfile()
-  const { uploadPhoto } = useProfilePhoto()
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
   const deleteAccount = useMutation({
@@ -90,16 +88,13 @@ export default function ProfilePage() {
 
       <Card className="border-0 shadow-lg overflow-hidden">
         <CardContent className="p-6">
-          {/* Profile Header with Photo Upload */}
+          {/* Profile Header */}
           <div className="flex flex-col items-center mb-6">
             <div className="relative mb-4">
-              <ProfilePhotoUpload
-                currentPhotoUrl={profile.profile_photo_url}
-                onUpload={async (file) => {
-                  await uploadPhoto.mutateAsync(file)
-                }}
-                disabled={uploadPhoto.isPending}
-                fallbackName={profile.full_name}
+              <Avatar
+                src={profile.profile_photo_url || undefined}
+                fallback={profile.full_name}
+                className="h-32 w-32 border-4 border-white shadow-xl"
               />
               {profile.is_verified && (
                 <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 z-10">
@@ -110,16 +105,35 @@ export default function ProfilePage() {
             <div className="text-center">
               <h2 className="text-2xl font-bold text-card-foreground mb-1">{profile.full_name}</h2>
               <p className="text-lg text-muted-foreground mb-3">{profile.age} years old</p>
-              {profile.linkedin_profile_url && (
+              {profile.linkedin_profile_url ? (
                 <a
-                  href={profile.linkedin_profile_url}
+                  href={profile.linkedin_profile_url.startsWith('http') ? profile.linkedin_profile_url : `https://${profile.linkedin_profile_url}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
+                  onClick={(e) => {
+                    const url = profile.linkedin_profile_url?.startsWith('http') 
+                      ? profile.linkedin_profile_url 
+                      : `https://${profile.linkedin_profile_url}`
+                    console.log('Opening LinkedIn URL:', url)
+                    if (!url || url === 'https://' || url === 'http://') {
+                      e.preventDefault()
+                      console.error('Invalid LinkedIn URL:', profile.linkedin_profile_url)
+                      return false
+                    }
+                  }}
+                  className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors cursor-pointer underline z-[60] relative"
+                  style={{ position: 'relative', zIndex: 60 }}
                 >
                   <img src="/linkedin-logo.svg" alt="LinkedIn" className="h-5 w-5" />
                   <span className="text-sm font-medium">View LinkedIn Profile</span>
                 </a>
+              ) : (
+                <Link
+                  to="/my-profile/edit"
+                  className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors text-sm"
+                >
+                  <span>Add LinkedIn Profile</span>
+                </Link>
               )}
             </div>
           </div>
