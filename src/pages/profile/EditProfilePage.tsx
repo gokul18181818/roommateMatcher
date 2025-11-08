@@ -71,6 +71,7 @@ const profileSchema = z.object({
   job_title: z.string().min(1, 'Job title is required'),
   job_title_other: z.string().optional(),
   company: z.string().min(1, 'Company is required'),
+  employment_type: z.enum(['intern', 'new_grad']).optional().nullable(),
   bio: z.string().min(150, 'Bio must be at least 150 characters').max(500, 'Bio must be less than 500 characters'),
   budget_min: z.number().optional().nullable(),
   budget_max: z.number().optional().nullable(),
@@ -127,6 +128,7 @@ export default function EditProfilePage() {
       job_title: COMMON_JOB_TITLES.includes(profile.job_title) ? profile.job_title : 'Other',
       job_title_other: COMMON_JOB_TITLES.includes(profile.job_title) ? '' : profile.job_title,
       company: profile.company,
+      employment_type: profile.employment_type || null,
       bio: profile.bio,
       budget_min: profile.budget_min,
       budget_max: profile.budget_max,
@@ -264,6 +266,21 @@ export default function EditProfilePage() {
               <label className="text-sm font-medium mb-2 block">Company</label>
               <Input {...register('company')} placeholder="Google" />
               {errors.company && <p className="text-sm text-destructive mt-1">{errors.company.message}</p>}
+            </div>
+
+            <div>
+              <label className="text-sm font-medium mb-2 block">
+                Employment Type (Optional)
+              </label>
+              <select {...register('employment_type')} className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm">
+                <option value="">Select...</option>
+                <option value="intern">Intern</option>
+                <option value="new_grad">New Grad</option>
+              </select>
+              {errors.employment_type && <p className="text-sm text-destructive mt-1">{errors.employment_type.message}</p>}
+              <p className="text-xs text-muted-foreground mt-1">
+                Optional - Are you an intern or new grad?
+              </p>
             </div>
 
             <div>

@@ -79,6 +79,11 @@ export default function UserCard({ profile, currentUserId }: UserCardProps) {
           )}
 
           <div className="flex items-center justify-center gap-2 flex-wrap pt-1">
+            {profile.employment_type && (
+              <Badge className="text-xs font-semibold px-3 py-1 bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-700 dark:from-blue-900/30 dark:to-cyan-900/30 dark:text-blue-300 border-0 rounded-full">
+                {profile.employment_type === 'intern' ? 'Intern' : 'New Grad'}
+              </Badge>
+            )}
             {profile.industry && (
               <Badge className="text-xs font-semibold px-3 py-1 bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 border-0 rounded-full">
                 {profile.industry}

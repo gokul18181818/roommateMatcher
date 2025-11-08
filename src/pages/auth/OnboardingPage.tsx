@@ -31,6 +31,7 @@ const profileSchema = z.object({
   job_title: z.string().min(1, 'Job title is required'),
   job_title_other: z.string().optional(),
   company: z.string().min(1, 'Company is required'),
+  employment_type: z.enum(['intern', 'new_grad']).optional().nullable(),
   linkedin_profile_url: z.string().url('Please enter a valid LinkedIn URL').min(1, 'LinkedIn profile URL is required'),
   instagram_handle: z.string().optional().or(z.literal('')),
   bio: z.string().min(100, 'Bio must be at least 100 characters').max(500, 'Bio must be less than 500 characters'),
@@ -310,6 +311,7 @@ export default function OnboardingPage() {
         state: data.state,
         job_title: finalJobTitle,
         company: data.company,
+        employment_type: data.employment_type || null,
         bio: data.bio,
         budget_min: data.budget_min || null,
         budget_max: data.budget_max || null,
@@ -434,6 +436,21 @@ export default function OnboardingPage() {
                   <label className="text-sm font-medium mb-2 block">Company</label>
                   <Input {...register('company')} placeholder="Google" />
                   {errors.company && <p className="text-sm text-destructive mt-1">{errors.company.message}</p>}
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-2 block">
+                    Employment Type (Optional)
+                  </label>
+                  <select {...register('employment_type')} className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm">
+                    <option value="">Select...</option>
+                    <option value="intern">Intern</option>
+                    <option value="new_grad">New Grad</option>
+                  </select>
+                  {errors.employment_type && <p className="text-sm text-destructive mt-1">{errors.employment_type.message}</p>}
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Optional - Are you an intern or new grad?
+                  </p>
                 </div>
 
                 <div>

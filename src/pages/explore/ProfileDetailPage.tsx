@@ -141,6 +141,15 @@ export default function ProfileDetailPage() {
                 <p className="text-base font-semibold text-card-foreground">{profile.city}, {profile.state}</p>
               </div>
             </div>
+            {profile.employment_type && (
+              <div className="flex items-start gap-4 p-4 bg-muted rounded-xl">
+                <div className="p-2 bg-card rounded-lg shadow-sm">
+                  <Badge variant="outline" className="font-medium bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800">
+                    {profile.employment_type === 'intern' ? 'Intern' : 'New Grad'}
+                  </Badge>
+                </div>
+              </div>
+            )}
             {profile.industry && (
               <div className="flex items-start gap-4 p-4 bg-muted rounded-xl">
                 <div className="p-2 bg-card rounded-lg shadow-sm">

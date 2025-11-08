@@ -17,6 +17,7 @@ export interface Profile {
   job_title: string
   company: string
   industry: string | null
+  employment_type: 'intern' | 'new_grad' | null
   work_schedule: 'remote' | 'hybrid' | 'in-office' | null
   bio: string
   budget_min: number | null
