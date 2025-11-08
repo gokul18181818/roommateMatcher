@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { useProfile, useUpdateProfile } from '@/hooks/useProfile'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -111,6 +112,7 @@ type ProfileFormData = z.infer<typeof profileSchema>
 export default function EditProfilePage() {
   const navigate = useNavigate()
   const { user } = useAuthStore()
+  const queryClient = useQueryClient()
   const { data: profile, isLoading } = useProfile()
   const updateProfile = useUpdateProfile()
 
@@ -146,6 +148,8 @@ export default function EditProfilePage() {
   const handlePhotoUpload = async (file: File) => {
     if (!user) throw new Error('Not authenticated')
     await completeProfilePhotoUpload(user.id, file, profile?.profile_photo_url || undefined)
+    // Invalidate profile query to refresh the data
+    queryClient.invalidateQueries({ queryKey: ['profile', user.id] })
   }
 
   const onSubmit = (data: ProfileFormData) => {
@@ -183,9 +187,9 @@ export default function EditProfilePage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
             {/* Profile Photo Upload */}
-            <div className="flex justify-center py-4 border-b">
+            <div className="flex justify-center py-6 border-b border-border/50">
               <ProfilePhotoUpload
                 currentPhotoUrl={profile?.profile_photo_url || null}
                 onUpload={handlePhotoUpload}
