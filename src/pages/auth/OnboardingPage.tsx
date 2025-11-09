@@ -165,6 +165,13 @@ export default function OnboardingPage() {
       // LinkedIn OIDC provides: name, email, picture, sub (LinkedIn ID)
       const linkedinData = metadata
       
+      // Debug: Log all LinkedIn data to console
+      console.log('🔍 LinkedIn OAuth Data Debug:')
+      console.log('Full user_metadata:', metadata)
+      console.log('Full app_metadata:', currentUser.app_metadata)
+      console.log('All user keys:', Object.keys(currentUser))
+      console.log('LinkedIn data extracted:', linkedinData)
+      
       // Auto-fill name from LinkedIn (LinkedIn OIDC provides 'name')
       const name = linkedinData.name || 
                    linkedinData.full_name || 
@@ -239,25 +246,8 @@ export default function OnboardingPage() {
         setValue('industry', industry)
       }
       
-      // Auto-fill LinkedIn profile URL if available
-      // LinkedIn OIDC provides 'sub' which is the LinkedIn ID, we can construct URL
-      const linkedinId = linkedinData.sub || 
-                        linkedinData.linkedin_id ||
-                        metadata.sub ||
-                        metadata.linkedin_id ||
-                        ''
-      
-      const linkedinUrl = linkedinData.profile_url || 
-                          linkedinData.linkedin_url || 
-                          linkedinData.url ||
-                          metadata.profile_url || 
-                          metadata.linkedin_url ||
-                          metadata.url ||
-                          (linkedinId ? `https://www.linkedin.com/in/${linkedinId}/` : '')
-      
-      if (linkedinUrl) {
-        setValue('linkedin_profile_url', linkedinUrl)
-      }
+      // Don't auto-fill LinkedIn URL - user must enter it manually
+      // LinkedIn OIDC doesn't reliably provide the vanity URL, so we require manual entry
       
       // Auto-fill profile photo from LinkedIn (LinkedIn OIDC provides 'picture')
       const profilePhoto = linkedinData.picture || 

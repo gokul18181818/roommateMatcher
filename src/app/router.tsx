@@ -11,6 +11,7 @@ import ChatPage from '@/pages/messages/ChatPage'
 import ProfilePage from '@/pages/profile/ProfilePage'
 import EditProfilePage from '@/pages/profile/EditProfilePage'
 import FeedbackPage from '@/pages/feedback/FeedbackPage'
+import LinkedInDebugPage from '@/pages/dev/LinkedInDebugPage'
 import { useAuth } from '@/hooks/useAuth'
 
 // MOCK MODE: Set to false to enable real authentication
@@ -96,6 +97,10 @@ export const router = createBrowserRouter([
       {
         path: 'feedback',
         element: <FeedbackPage />,
+      },
+      {
+        path: 'debug/linkedin',
+        element: <LinkedInDebugPage />,
       },
     ],
   },
