@@ -160,7 +160,6 @@ export default function OnboardingPage() {
       if (!currentUser) return
       
       const metadata = currentUser.user_metadata || {}
-      const appMetadata = currentUser.app_metadata || {}
       
       // Extract LinkedIn data - LinkedIn OAuth provides data in user_metadata
       // LinkedIn OIDC provides: name, email, picture, sub (LinkedIn ID)
@@ -304,7 +303,6 @@ export default function OnboardingPage() {
 
       // Extract LinkedIn data from user metadata
       const metadata = currentUser.user_metadata || {}
-      const appMetadata = currentUser.app_metadata || {}
       const linkedinData = metadata
       
       // Get LinkedIn profile photo if available (LinkedIn OIDC provides 'picture')
