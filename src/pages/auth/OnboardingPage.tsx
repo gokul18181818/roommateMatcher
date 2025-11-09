@@ -163,9 +163,10 @@ export default function OnboardingPage() {
       const appMetadata = currentUser.app_metadata || {}
       
       // Extract LinkedIn data - LinkedIn OAuth provides data in user_metadata
-      const linkedinData = appMetadata.provider === 'linkedin' ? metadata : metadata
+      // LinkedIn OIDC provides: name, email, picture, sub (LinkedIn ID)
+      const linkedinData = metadata
       
-      // Auto-fill name from LinkedIn (LinkedIn provides 'name' or 'full_name')
+      // Auto-fill name from LinkedIn (LinkedIn OIDC provides 'name')
       const name = linkedinData.name || 
                    linkedinData.full_name || 
                    metadata.name || 
@@ -176,11 +177,13 @@ export default function OnboardingPage() {
         setValue('full_name', name)
       }
       
-      // Auto-fill job title from LinkedIn (might be in 'job_title' or 'headline')
+      // Auto-fill job title from LinkedIn (might be in 'job_title', 'headline', or 'given_name')
       const jobTitle = linkedinData.job_title || 
                        linkedinData.headline || 
+                       linkedinData.title ||
                        metadata.job_title || 
                        metadata.headline || 
+                       metadata.title ||
                        ''
       if (jobTitle) {
         setValue('job_title', jobTitle)
@@ -189,48 +192,86 @@ export default function OnboardingPage() {
       // Auto-fill company from LinkedIn
       const company = linkedinData.company || 
                       linkedinData.company_name || 
+                      linkedinData.organization ||
                       metadata.company || 
                       metadata.company_name || 
+                      metadata.organization ||
                       ''
       if (company) {
         setValue('company', company)
       }
       
-      // Auto-fill location if available (LinkedIn provides 'location' or 'locality')
+      // Auto-fill location if available (LinkedIn provides 'location', 'locality', 'city', 'region')
       const location = linkedinData.location || 
                        linkedinData.locality || 
+                       linkedinData.city ||
                        metadata.location || 
                        metadata.locality || 
+                       metadata.city ||
                        ''
+      const state = linkedinData.region || 
+                    linkedinData.state ||
+                    metadata.region || 
+                    metadata.state ||
+                    ''
+      
       if (location) {
         // Try to parse city and state from location string
         const parts = location.split(',').map((p: string) => p.trim())
         if (parts.length >= 2) {
           setValue('city', parts[0])
-          setValue('state', parts[1])
+          setValue('state', parts[1].length === 2 ? parts[1] : parts[1].substring(0, 2))
         } else if (parts.length === 1) {
           setValue('city', parts[0])
         }
       }
       
+      if (state && state.length === 2) {
+        setValue('state', state.toUpperCase())
+      }
+      
       // Auto-fill industry if available
       const industry = linkedinData.industry || 
+                       linkedinData.industry_name ||
                        metadata.industry || 
+                       metadata.industry_name ||
                        ''
       if (industry) {
         setValue('industry', industry)
       }
       
       // Auto-fill LinkedIn profile URL if available
+      // LinkedIn OIDC provides 'sub' which is the LinkedIn ID, we can construct URL
+      const linkedinId = linkedinData.sub || 
+                        linkedinData.linkedin_id ||
+                        metadata.sub ||
+                        metadata.linkedin_id ||
+                        ''
+      
       const linkedinUrl = linkedinData.profile_url || 
                           linkedinData.linkedin_url || 
                           linkedinData.url ||
                           metadata.profile_url || 
                           metadata.linkedin_url ||
                           metadata.url ||
-                          ''
+                          (linkedinId ? `https://www.linkedin.com/in/${linkedinId}/` : '')
+      
       if (linkedinUrl) {
         setValue('linkedin_profile_url', linkedinUrl)
+      }
+      
+      // Auto-fill profile photo from LinkedIn (LinkedIn OIDC provides 'picture')
+      const profilePhoto = linkedinData.picture || 
+                          linkedinData.avatar_url ||
+                          linkedinData.photo ||
+                          metadata.picture || 
+                          metadata.avatar_url ||
+                          metadata.photo ||
+                          ''
+      
+      if (profilePhoto) {
+        // Store profile photo URL - it will be used when creating the profile
+        // Note: This will be handled in the createProfile mutation
       }
     }
     
@@ -264,13 +305,16 @@ export default function OnboardingPage() {
       // Extract LinkedIn data from user metadata
       const metadata = currentUser.user_metadata || {}
       const appMetadata = currentUser.app_metadata || {}
-      const linkedinData = appMetadata.provider === 'linkedin' ? metadata : {}
+      const linkedinData = metadata
       
-      // Get LinkedIn profile photo if available
-      const profilePhotoUrl = linkedinData.avatar_url || 
-                              linkedinData.picture || 
-                              metadata.avatar_url || 
+      // Get LinkedIn profile photo if available (LinkedIn OIDC provides 'picture')
+      const profilePhotoUrl = linkedinData.picture || 
+                              linkedinData.avatar_url || 
+                              linkedinData.photo ||
                               metadata.picture || 
+                              metadata.avatar_url || 
+                              metadata.photo ||
+                              currentUser.user_metadata?.picture ||
                               currentUser.user_metadata?.avatar_url ||
                               null
 
@@ -278,9 +322,11 @@ export default function OnboardingPage() {
       // LinkedIn OAuth with OIDC provides 'sub' which is a numeric ID, not a username
       // We need to fetch the vanityName from LinkedIn API using the access token
       const linkedinId = linkedinData.sub || 
+                        linkedinData.linkedin_id ||
                         linkedinData.id || 
                         metadata.sub || 
                         metadata.linkedin_id ||
+                        metadata.id ||
                         currentUser.id // Fallback to user ID if no LinkedIn ID
       
       // Use the LinkedIn URL from the form if provided, otherwise try to get it from various sources
@@ -294,6 +340,7 @@ export default function OnboardingPage() {
                             metadata.profile_url || 
                             metadata.linkedin_url ||
                             metadata.url ||
+                            (linkedinId && linkedinId !== currentUser.id ? `https://www.linkedin.com/in/${linkedinId}/` : null) ||
                             null
         
         // If we don't have a URL, try to fetch it from LinkedIn API using the access token
@@ -412,8 +459,18 @@ export default function OnboardingPage() {
                   <label className="text-sm font-medium mb-2 block">
                     Full Name <span className="text-destructive">*</span>
                   </label>
-                  <Input {...register('full_name')} placeholder="John Doe" />
+                  <Input 
+                    {...register('full_name')} 
+                    placeholder="John Doe" 
+                    disabled={!!watch('full_name')}
+                    className="bg-muted/50 cursor-not-allowed"
+                  />
                   {errors.full_name && <p className="text-sm text-destructive mt-1">{errors.full_name.message}</p>}
+                  {watch('full_name') && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Name is set from your LinkedIn profile and cannot be changed
+                    </p>
+                  )}
                 </div>
 
                 <div>
