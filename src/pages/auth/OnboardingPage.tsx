@@ -165,13 +165,6 @@ export default function OnboardingPage() {
       // LinkedIn OIDC provides: name, email, picture, sub (LinkedIn ID)
       const linkedinData = metadata
       
-      // Debug: Log all LinkedIn data to console
-      console.log('🔍 LinkedIn OAuth Data Debug:')
-      console.log('Full user_metadata:', metadata)
-      console.log('Full app_metadata:', currentUser.app_metadata)
-      console.log('All user keys:', Object.keys(currentUser))
-      console.log('LinkedIn data extracted:', linkedinData)
-      
       // Auto-fill name from LinkedIn (LinkedIn OIDC provides 'name')
       // LinkedIn OIDC only provides: name, given_name, family_name, email, picture, sub
       const name = linkedinData.name || 
