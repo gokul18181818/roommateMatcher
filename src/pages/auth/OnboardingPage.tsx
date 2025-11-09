@@ -173,81 +173,25 @@ export default function OnboardingPage() {
       console.log('LinkedIn data extracted:', linkedinData)
       
       // Auto-fill name from LinkedIn (LinkedIn OIDC provides 'name')
+      // LinkedIn OIDC only provides: name, given_name, family_name, email, picture, sub
       const name = linkedinData.name || 
-                   linkedinData.full_name || 
-                   metadata.name || 
-                   metadata.full_name ||
+                   metadata.name ||
+                   (linkedinData.given_name && linkedinData.family_name 
+                     ? `${linkedinData.given_name} ${linkedinData.family_name}` 
+                     : '') ||
                    currentUser.email?.split('@')[0] || // Fallback to email username
                    ''
       if (name) {
         setValue('full_name', name)
       }
       
-      // Auto-fill job title from LinkedIn (might be in 'job_title', 'headline', or 'given_name')
-      const jobTitle = linkedinData.job_title || 
-                       linkedinData.headline || 
-                       linkedinData.title ||
-                       metadata.job_title || 
-                       metadata.headline || 
-                       metadata.title ||
-                       ''
-      if (jobTitle) {
-        setValue('job_title', jobTitle)
-      }
-      
-      // Auto-fill company from LinkedIn
-      const company = linkedinData.company || 
-                      linkedinData.company_name || 
-                      linkedinData.organization ||
-                      metadata.company || 
-                      metadata.company_name || 
-                      metadata.organization ||
-                      ''
-      if (company) {
-        setValue('company', company)
-      }
-      
-      // Auto-fill location if available (LinkedIn provides 'location', 'locality', 'city', 'region')
-      const location = linkedinData.location || 
-                       linkedinData.locality || 
-                       linkedinData.city ||
-                       metadata.location || 
-                       metadata.locality || 
-                       metadata.city ||
-                       ''
-      const state = linkedinData.region || 
-                    linkedinData.state ||
-                    metadata.region || 
-                    metadata.state ||
-                    ''
-      
-      if (location) {
-        // Try to parse city and state from location string
-        const parts = location.split(',').map((p: string) => p.trim())
-        if (parts.length >= 2) {
-          setValue('city', parts[0])
-          setValue('state', parts[1].length === 2 ? parts[1] : parts[1].substring(0, 2))
-        } else if (parts.length === 1) {
-          setValue('city', parts[0])
-        }
-      }
-      
-      if (state && state.length === 2) {
-        setValue('state', state.toUpperCase())
-      }
-      
-      // Auto-fill industry if available
-      const industry = linkedinData.industry || 
-                       linkedinData.industry_name ||
-                       metadata.industry || 
-                       metadata.industry_name ||
-                       ''
-      if (industry) {
-        setValue('industry', industry)
-      }
-      
-      // Don't auto-fill LinkedIn URL - user must enter it manually
-      // LinkedIn OIDC doesn't reliably provide the vanity URL, so we require manual entry
+      // Note: LinkedIn OIDC with basic scopes (openid, profile, email) does NOT provide:
+      // - Job title
+      // - Company
+      // - Location/City/State
+      // - Industry
+      // - LinkedIn profile vanity URL
+      // These fields must be filled manually by the user
       
       // Auto-fill profile photo from LinkedIn (LinkedIn OIDC provides 'picture')
       const profilePhoto = linkedinData.picture || 
