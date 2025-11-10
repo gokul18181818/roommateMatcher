@@ -99,6 +99,7 @@ export default function ChatPage() {
           },
           () => {
             queryClient.invalidateQueries({ queryKey: ['messages', conversationId] })
+            queryClient.invalidateQueries({ queryKey: ['unreadMessagesCount'] })
           }
         )
         .on(
@@ -111,6 +112,7 @@ export default function ChatPage() {
           },
           () => {
             queryClient.invalidateQueries({ queryKey: ['messages', conversationId] })
+            queryClient.invalidateQueries({ queryKey: ['unreadMessagesCount'] })
           }
         )
         .subscribe()
@@ -136,9 +138,13 @@ export default function ChatPage() {
           .from('messages')
           .update({ is_read: true, read_at: new Date().toISOString() })
           .in('id', unreadMessages.map((m) => m.id))
+          .then(() => {
+            // Invalidate unread count query to update badge immediately
+            queryClient.invalidateQueries({ queryKey: ['unreadMessagesCount'] })
+          })
       }
     }
-  }, [messages, user])
+  }, [messages, user, queryClient])
 
   const sendMessage = useMutation({
     mutationFn: async (content: string) => {

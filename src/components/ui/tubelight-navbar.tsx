@@ -8,6 +8,7 @@ interface NavItem {
   name: string
   url: string
   icon: LucideIcon
+  badgeCount?: number
 }
 
 interface TubelightNavBarProps {
@@ -62,9 +63,17 @@ export function TubelightNavBar({ items, className }: TubelightNavBarProps) {
                 isActive && "bg-muted text-primary",
               )}
             >
-              <span className="hidden md:inline">{item.name}</span>
-              <span className="md:hidden">
+              <span className="hidden md:inline relative">
+                {item.name}
+                {item.badgeCount !== undefined && item.badgeCount > 0 && (
+                  <span className="absolute -top-1 -right-2 h-2 w-2 bg-red-500 rounded-full border-2 border-card"></span>
+                )}
+              </span>
+              <span className="md:hidden relative">
                 <Icon size={18} strokeWidth={2.5} />
+                {item.badgeCount !== undefined && item.badgeCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 bg-red-500 rounded-full border-2 border-card"></span>
+                )}
               </span>
               {isActive && (
                 <motion.div
