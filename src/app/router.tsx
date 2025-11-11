@@ -13,9 +13,6 @@ import EditProfilePage from '@/pages/profile/EditProfilePage'
 import FeedbackPage from '@/pages/feedback/FeedbackPage'
 import { useAuth } from '@/hooks/useAuth'
 
-// MOCK MODE: Set to false to enable real authentication
-// const MOCK_MODE = false // Currently not used
-
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   useAuth() // Initialize auth state
   const { user, loading } = useAuthStore()
