@@ -152,33 +152,35 @@ export default function EditProfilePage() {
     queryClient.invalidateQueries({ queryKey: ['profile', user.id] })
   }
 
-  const onSubmit = (data: ProfileFormData) => {
+  const onSubmit = async (data: ProfileFormData) => {
     // Use "Other" field values if "Other" was selected
     const finalCity = data.city === 'Other' ? data.city_other : data.city
     const finalJobTitle = data.job_title === 'Other' ? data.job_title_other : data.job_title
     const finalIndustry = data.industry === 'Other' ? data.industry_other : data.industry
 
+    // Exclude helper fields that don't exist in the database
+    const { city_other, job_title_other, industry_other, ...restData } = data
+
     const submitData = {
-      ...data,
+      ...restData,
       city: finalCity,
       job_title: finalJobTitle,
       industry: finalIndustry,
     }
 
-    updateProfile.mutate(submitData, {
-      onSuccess: () => {
-        // Invalidate and refetch profile data to ensure fresh data
-        queryClient.invalidateQueries({ queryKey: ['profile', user?.id] })
-        queryClient.invalidateQueries({ queryKey: ['profile'] })
-        
-        // Navigate back to profile page after successful save
-        navigate('/my-profile', { replace: true })
-      },
-      onError: (error) => {
-        console.error('Failed to update profile:', error)
-        // You could add a toast notification here if needed
-      },
-    })
+    try {
+      await updateProfile.mutateAsync(submitData)
+      
+      // Invalidate and refetch profile data to ensure fresh data
+      queryClient.invalidateQueries({ queryKey: ['profile', user?.id] })
+      queryClient.invalidateQueries({ queryKey: ['profile'] })
+      
+      // Navigate back to profile page after successful save
+      navigate('/my-profile', { replace: true })
+    } catch (error) {
+      console.error('Failed to update profile:', error)
+      alert('Failed to save profile. Please try again.')
+    }
   }
 
   if (isLoading) {
