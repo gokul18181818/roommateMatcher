@@ -4,6 +4,7 @@ import LoginPage from '@/pages/auth/LoginPage'
 import OnboardingPage from '@/pages/auth/OnboardingPage'
 import AuthCallback from '@/pages/auth/AuthCallback'
 import MainLayout from '@/components/layout/MainLayout'
+import PublicLayout from '@/components/layout/PublicLayout'
 import ExplorePage from '@/pages/explore/ExplorePage'
 import ProfileDetailPage from '@/pages/explore/ProfileDetailPage'
 import MessagesPage from '@/pages/messages/MessagesPage'
@@ -11,6 +12,7 @@ import ChatPage from '@/pages/messages/ChatPage'
 import ProfilePage from '@/pages/profile/ProfilePage'
 import EditProfilePage from '@/pages/profile/EditProfilePage'
 import FeedbackPage from '@/pages/feedback/FeedbackPage'
+import CareersPage from '@/pages/careers/CareersPage'
 import { useAuth } from '@/hooks/useAuth'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -45,6 +47,14 @@ export const router = createBrowserRouter([
   {
     path: '/auth/callback',
     element: <AuthCallback />,
+  },
+  {
+    path: '/careers',
+    element: (
+      <PublicLayout>
+        <CareersPage />
+      </PublicLayout>
+    ),
   },
   {
     path: '/onboarding',

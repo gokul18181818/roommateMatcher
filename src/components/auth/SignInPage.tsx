@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useCallback } from 'react'
 import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
+import { Button } from '@/components/ui/button'
 
 // --- HELPER COMPONENTS (ICONS) ---
 const LinkedInIcon = () => (
@@ -185,8 +187,13 @@ export const SignInPage: React.FC<SignInPageProps> = ({
 
   return (
     <div className="bg-white dark:bg-background text-gray-900 dark:text-foreground min-h-screen flex flex-col relative">
-      {/* Theme Toggle */}
-      <div className="absolute top-4 right-4 z-50">
+      {/* Top Navigation */}
+      <div className="absolute top-4 right-4 z-50 flex items-center gap-3">
+        <Link to="/careers">
+          <Button variant="ghost" size="sm" className="h-9">
+            Careers
+          </Button>
+        </Link>
         <ThemeToggle />
       </div>
 

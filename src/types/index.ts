@@ -81,3 +81,34 @@ export interface Block {
   reason: string | null
 }
 
+export interface JobPosting {
+  id: string
+  title: string
+  department: string
+  location: string
+  type: string
+  salary: string
+  description: string
+  requirements: string[]
+  responsibilities: string[]
+  is_unpaid: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface JobApplication {
+  id: string
+  job_posting_id: string
+  applicant_id: string | null
+  applicant_name: string
+  applicant_email: string
+  knows_unpaid: boolean
+  graduated_highschool: boolean
+  why_want_job: string
+  previous_experience: string
+  resume_url: string | null
+  status: 'pending' | 'reviewed' | 'accepted' | 'rejected'
+  created_at: string
+  updated_at: string
+}
+
