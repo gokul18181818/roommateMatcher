@@ -121,16 +121,19 @@ export default function CareersPage() {
                       }
                       
                       // Check if it's a section heading
-                      const isHeading = trimmed.match(/^(Company Description|Role Description|Tech Stack|Ideal Candidate|Key Responsibilities|Requirements)/i)
+                      const isHeading = trimmed.match(/^(Company Description|Role Description|Tech Stack|Ideal Candidate|Key Responsibilities|Requirements|What You'll Do|Who This Role Is For|Note:)/i)
                       
                       if (isHeading) {
                         const lines = paragraph.split('\n')
                         const title = normalizeHeading(lines[0])
                         const content = lines.slice(1).join('\n').trim()
                         
+                        // Check if it's a main heading (Company Description, Role Description) or sub-heading
+                        const isMainHeading = title.match(/^(Company Description|Role Description)/i)
+                        
                         return (
-                          <div key={idx} className="space-y-3 mb-6 last:mb-0">
-                            <h4 className="font-medium text-sm text-card-foreground mb-3">
+                          <div key={idx} className={`space-y-3 ${isMainHeading ? 'mb-6' : 'mb-5'} last:mb-0`}>
+                            <h4 className={`${isMainHeading ? 'font-normal text-base' : 'font-medium text-sm'} text-card-foreground mb-3`}>
                               {title}
                             </h4>
                             {content && (
