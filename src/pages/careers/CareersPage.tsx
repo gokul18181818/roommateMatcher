@@ -87,27 +87,68 @@ export default function CareersPage() {
                   <div className="prose prose-sm dark:prose-invert max-w-none">
                     {job.description.split('\n\n').map((paragraph, idx) => {
                       const trimmed = paragraph.trim()
-                      if (trimmed.startsWith('Company Description') || trimmed.startsWith('Role Description')) {
+                      if (!trimmed) return null
+                      
+                      // Check if it's a section heading
+                      if (trimmed.startsWith('Company Description') || trimmed.startsWith('Role Description') || trimmed.startsWith('Tech Stack') || trimmed.startsWith('Ideal Candidate')) {
                         const lines = paragraph.split('\n')
-                        const title = lines[0]
+                        const title = lines[0].replace(/^[:\-•]\s*/, '').trim()
                         const content = lines.slice(1).join('\n').trim()
+                        
                         return (
-                          <div key={idx} className="space-y-2 mb-5 last:mb-0">
-                            <h4 className="font-semibold text-base text-card-foreground mb-2">{title}</h4>
-                            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
-                              {content}
-                            </p>
+                          <div key={idx} className="space-y-2.5 mb-5 last:mb-0">
+                            <h4 className="font-normal text-sm text-card-foreground uppercase tracking-wide mb-2.5 opacity-80">
+                              {title}
+                            </h4>
+                            {content && (
+                              <div className="text-sm text-muted-foreground leading-relaxed space-y-2.5">
+                                {content.split('\n').map((line, lineIdx) => {
+                                  const trimmedLine = line.trim()
+                                  if (!trimmedLine) return null
+                                  // Check if it's a bullet point or list item
+                                  if (trimmedLine.startsWith('•') || trimmedLine.startsWith('-') || trimmedLine.match(/^\d+\./)) {
+                                    return (
+                                      <div key={lineIdx} className="flex items-start gap-2.5 pl-2">
+                                        <span className="text-indigo-500 dark:text-indigo-400 mt-1.5 text-xs">•</span>
+                                        <span className="flex-1">{trimmedLine.replace(/^[•\-\d+\.]\s*/, '')}</span>
+                                      </div>
+                                    )
+                                  }
+                                  return (
+                                    <p key={lineIdx} className="leading-relaxed">
+                                      {trimmedLine}
+                                    </p>
+                                  )
+                                })}
+                              </div>
+                            )}
                           </div>
                         )
                       }
-                      if (trimmed) {
-                        return (
-                          <p key={idx} className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line mb-4 last:mb-0">
-                            {paragraph}
-                          </p>
-                        )
-                      }
-                      return null
+                      
+                      // Regular paragraph
+                      return (
+                        <div key={idx} className="text-sm text-muted-foreground leading-relaxed space-y-2.5 mb-4 last:mb-0">
+                          {paragraph.split('\n').map((line, lineIdx) => {
+                            const trimmedLine = line.trim()
+                            if (!trimmedLine) return null
+                            // Check if it's a bullet point
+                            if (trimmedLine.startsWith('•') || trimmedLine.startsWith('-') || trimmedLine.match(/^\d+\./)) {
+                              return (
+                                <div key={lineIdx} className="flex items-start gap-2.5 pl-2">
+                                  <span className="text-indigo-500 dark:text-indigo-400 mt-1.5 text-xs">•</span>
+                                  <span className="flex-1">{trimmedLine.replace(/^[•\-\d+\.]\s*/, '')}</span>
+                                </div>
+                              )
+                            }
+                            return (
+                              <p key={lineIdx} className="leading-relaxed">
+                                {trimmedLine}
+                              </p>
+                            )
+                          })}
+                        </div>
+                      )
                     })}
                   </div>
                 </div>
