@@ -83,40 +83,73 @@ export default function CareersPage() {
                   </div>
                 </div>
 
-                <div className="space-y-4 pt-2">
+                <div className="space-y-5 pt-2">
                   <div className="prose prose-sm dark:prose-invert max-w-none">
                     {job.description.split('\n\n').map((paragraph, idx) => {
                       const trimmed = paragraph.trim()
                       if (!trimmed) return null
                       
+                      // Normalize heading text (remove all caps, make title case)
+                      const normalizeHeading = (text: string) => {
+                        const cleaned = text.replace(/^[:\-•]\s*/, '').trim()
+                        // If text is all caps, convert to title case
+                        if (cleaned === cleaned.toUpperCase() && cleaned.length > 1) {
+                          return cleaned
+                            .split(' ')
+                            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                            .join(' ')
+                        }
+                        return cleaned
+                            .split(' ')
+                            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                            .join(' ')
+                      }
+                      
+                      // Normalize paragraph text (convert all caps to sentence case)
+                      const normalizeText = (text: string) => {
+                        // If entire text is uppercase and has multiple words, convert to sentence case
+                        if (text === text.toUpperCase() && text.length > 15 && text.split(/\s+/).length > 2) {
+                          return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
+                        }
+                        // If it's a short all-caps phrase, convert to title case
+                        if (text === text.toUpperCase() && text.length > 3 && text.length <= 15) {
+                          return text.split(' ').map(word => 
+                            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                          ).join(' ')
+                        }
+                        return text
+                      }
+                      
                       // Check if it's a section heading
-                      if (trimmed.startsWith('Company Description') || trimmed.startsWith('Role Description') || trimmed.startsWith('Tech Stack') || trimmed.startsWith('Ideal Candidate')) {
+                      const isHeading = trimmed.match(/^(Company Description|Role Description|Tech Stack|Ideal Candidate|Key Responsibilities|Requirements)/i)
+                      
+                      if (isHeading) {
                         const lines = paragraph.split('\n')
-                        const title = lines[0].replace(/^[:\-•]\s*/, '').trim()
+                        const title = normalizeHeading(lines[0])
                         const content = lines.slice(1).join('\n').trim()
                         
                         return (
-                          <div key={idx} className="space-y-2.5 mb-5 last:mb-0">
-                            <h4 className="font-normal text-sm text-card-foreground uppercase tracking-wide mb-2.5 opacity-80">
+                          <div key={idx} className="space-y-3 mb-6 last:mb-0">
+                            <h4 className="font-medium text-sm text-card-foreground mb-3">
                               {title}
                             </h4>
                             {content && (
-                              <div className="text-sm text-muted-foreground leading-relaxed space-y-2.5">
-                                {content.split('\n').map((line, lineIdx) => {
+                              <div className="text-sm text-muted-foreground leading-relaxed space-y-3">
+                                {content.split('\n').filter(line => line.trim()).map((line, lineIdx) => {
                                   const trimmedLine = line.trim()
-                                  if (!trimmedLine) return null
                                   // Check if it's a bullet point or list item
-                                  if (trimmedLine.startsWith('•') || trimmedLine.startsWith('-') || trimmedLine.match(/^\d+\./)) {
+                                  if (trimmedLine.match(/^[•\-\d+\.]\s+/)) {
+                                    const bulletText = trimmedLine.replace(/^[•\-\d+\.]\s+/, '')
                                     return (
-                                      <div key={lineIdx} className="flex items-start gap-2.5 pl-2">
-                                        <span className="text-indigo-500 dark:text-indigo-400 mt-1.5 text-xs">•</span>
-                                        <span className="flex-1">{trimmedLine.replace(/^[•\-\d+\.]\s*/, '')}</span>
+                                      <div key={lineIdx} className="flex items-start gap-3 pl-1">
+                                        <span className="text-indigo-500 dark:text-indigo-400 mt-1 text-xs flex-shrink-0">•</span>
+                                        <span className="flex-1 leading-relaxed">{normalizeText(bulletText)}</span>
                                       </div>
                                     )
                                   }
                                   return (
                                     <p key={lineIdx} className="leading-relaxed">
-                                      {trimmedLine}
+                                      {normalizeText(trimmedLine)}
                                     </p>
                                   )
                                 })}
@@ -126,24 +159,29 @@ export default function CareersPage() {
                         )
                       }
                       
-                      // Regular paragraph
+                      // Regular paragraph - split into sentences for better readability
+                      const sentences = paragraph.split(/[.!?]+/).filter(s => s.trim())
+                      
                       return (
-                        <div key={idx} className="text-sm text-muted-foreground leading-relaxed space-y-2.5 mb-4 last:mb-0">
-                          {paragraph.split('\n').map((line, lineIdx) => {
+                        <div key={idx} className="text-sm text-muted-foreground leading-relaxed space-y-3 mb-5 last:mb-0">
+                          {paragraph.split('\n').filter(line => line.trim()).map((line, lineIdx) => {
                             const trimmedLine = line.trim()
                             if (!trimmedLine) return null
+                            
                             // Check if it's a bullet point
-                            if (trimmedLine.startsWith('•') || trimmedLine.startsWith('-') || trimmedLine.match(/^\d+\./)) {
+                            if (trimmedLine.match(/^[•\-\d+\.]\s+/)) {
+                              const bulletText = trimmedLine.replace(/^[•\-\d+\.]\s+/, '')
                               return (
-                                <div key={lineIdx} className="flex items-start gap-2.5 pl-2">
-                                  <span className="text-indigo-500 dark:text-indigo-400 mt-1.5 text-xs">•</span>
-                                  <span className="flex-1">{trimmedLine.replace(/^[•\-\d+\.]\s*/, '')}</span>
+                                <div key={lineIdx} className="flex items-start gap-3 pl-1">
+                                  <span className="text-indigo-500 dark:text-indigo-400 mt-1 text-xs flex-shrink-0">•</span>
+                                  <span className="flex-1 leading-relaxed">{normalizeText(bulletText)}</span>
                                 </div>
                               )
                             }
+                            
                             return (
                               <p key={lineIdx} className="leading-relaxed">
-                                {trimmedLine}
+                                {normalizeText(trimmedLine)}
                               </p>
                             )
                           })}
