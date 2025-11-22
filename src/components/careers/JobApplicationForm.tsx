@@ -22,7 +22,7 @@ export function JobApplicationForm({ job, open, onOpenChange, onSuccess }: JobAp
   const [resumeFile, setResumeFile] = useState<File | null>(null)
   const [formData, setFormData] = useState({
     applicant_name: user?.user_metadata?.full_name || '',
-    applicant_email: user?.email || '',
+    applicant_email: '',
     knows_unpaid: false,
     graduated_highschool: false,
     why_want_job: '',
@@ -106,7 +106,7 @@ export function JobApplicationForm({ job, open, onOpenChange, onSuccess }: JobAp
       // Reset form
       setFormData({
         applicant_name: user?.user_metadata?.full_name || '',
-        applicant_email: user?.email || '',
+        applicant_email: '',
         knows_unpaid: false,
         graduated_highschool: false,
         why_want_job: '',
