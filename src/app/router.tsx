@@ -13,6 +13,7 @@ import ProfilePage from '@/pages/profile/ProfilePage'
 import EditProfilePage from '@/pages/profile/EditProfilePage'
 import FeedbackPage from '@/pages/feedback/FeedbackPage'
 import CareersPage from '@/pages/careers/CareersPage'
+import ApplicationsPage from '@/pages/admin/ApplicationsPage'
 import { useAuth } from '@/hooks/useAuth'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -53,6 +54,14 @@ export const router = createBrowserRouter([
     element: (
       <PublicLayout>
         <CareersPage />
+      </PublicLayout>
+    ),
+  },
+  {
+    path: '/admin/applications',
+    element: (
+      <PublicLayout>
+        <ApplicationsPage />
       </PublicLayout>
     ),
   },
