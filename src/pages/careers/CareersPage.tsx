@@ -159,9 +159,7 @@ export default function CareersPage() {
                         )
                       }
                       
-                      // Regular paragraph - split into sentences for better readability
-                      const sentences = paragraph.split(/[.!?]+/).filter(s => s.trim())
-                      
+                      // Regular paragraph
                       return (
                         <div key={idx} className="text-sm text-muted-foreground leading-relaxed space-y-3 mb-5 last:mb-0">
                           {paragraph.split('\n').filter(line => line.trim()).map((line, lineIdx) => {
