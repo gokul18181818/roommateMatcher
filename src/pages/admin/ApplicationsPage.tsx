@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase'
 import { JobApplication, JobPosting } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Download, Mail, FileText, Calendar, Lock, ArrowLeft, Briefcase, Star, Check, X } from 'lucide-react'
+import { Download, Mail, FileText, Calendar, Lock, ArrowLeft, Briefcase, Star, Check, X, Trash2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 
 const ADMIN_PASSWORD = 'flash1818$'
@@ -19,6 +19,8 @@ export default function ApplicationsPage() {
   const [loadingJobs, setLoadingJobs] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
 
   // Check if already authenticated (stored in sessionStorage)
   useEffect(() => {
@@ -210,6 +212,37 @@ export default function ApplicationsPage() {
     } finally {
       setUpdatingStatus(null)
     }
+  }
+
+  const handleDeleteClick = (applicationId: string) => {
+    setDeleteConfirmId(applicationId)
+  }
+
+  const confirmDelete = async () => {
+    if (!deleteConfirmId) return
+    
+    setDeletingId(deleteConfirmId)
+    try {
+      const { error } = await supabase
+        .from('job_applications')
+        .delete()
+        .eq('id', deleteConfirmId)
+
+      if (error) throw error
+
+      // Remove from local state
+      setApplications(prev => prev.filter(app => app.id !== deleteConfirmId))
+      setDeleteConfirmId(null)
+    } catch (error) {
+      console.error('Error deleting application:', error)
+      alert(`Failed to delete application: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
+  const cancelDelete = () => {
+    setDeleteConfirmId(null)
   }
 
   // Password protection screen
@@ -447,7 +480,44 @@ export default function ApplicationsPage() {
                 {updatingStatus === app.id && (
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
                 )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleDeleteClick(app.id)}
+                  disabled={deletingId === app.id}
+                  className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:border-red-500 ml-auto"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Delete
+                </Button>
               </div>
+
+              {/* Delete Confirmation Dialog */}
+              {deleteConfirmId === app.id && (
+                <div className="mt-4 p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">
+                  <p className="text-sm text-red-800 dark:text-red-200 font-medium mb-3">
+                    Are you sure you want to delete this application? This action cannot be undone.
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={confirmDelete}
+                      disabled={deletingId === app.id}
+                    >
+                      {deletingId === app.id ? 'Deleting...' : 'Yes, Delete'}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={cancelDelete}
+                      disabled={deletingId === app.id}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              )}
 
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
