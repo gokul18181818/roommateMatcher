@@ -1,4 +1,4 @@
-import { Compass, MessageSquare, User, MessageCircle } from 'lucide-react'
+import { Compass, MessageSquare, User, MessageCircle, Briefcase } from 'lucide-react'
 import { TubelightNavBar } from '@/components/ui/tubelight-navbar'
 import { useUnreadMessagesCount } from '@/hooks/useUnreadMessages'
 
@@ -8,6 +8,7 @@ export default function TabNavigation() {
   const navItems = [
     { name: 'Explore', url: '/explore', icon: Compass },
     { name: 'Messages', url: '/messages', icon: MessageSquare, badgeCount: unreadCount },
+    { name: 'Careers', url: '/careers', icon: Briefcase },
     { name: 'Feedback', url: '/feedback', icon: MessageCircle },
     { name: 'Profile', url: '/my-profile', icon: User },
   ]
